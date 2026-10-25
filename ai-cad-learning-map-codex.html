@@ -1,0 +1,2859 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="面向 SolidWorks 2025 用户的 AI 工程图转参数化建模学习地图与半自动部署流程，核对于 2026-10-24。">
+  <title>AI × SolidWorks 工程图转模学习地图 · 2026</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07111a;
+      --bg-raised: #0b1723;
+      --panel: #0e1c29;
+      --panel-strong: #122535;
+      --ink: #edf7f5;
+      --muted: #9eb2c1;
+      --faint: #6f8595;
+      --line: rgba(161, 195, 211, 0.17);
+      --line-strong: rgba(126, 220, 206, 0.38);
+      --accent: #68d9c7;
+      --accent-soft: rgba(104, 217, 199, 0.12);
+      --accent-ink: #05201c;
+      --amber: #f4be65;
+      --amber-soft: rgba(244, 190, 101, 0.12);
+      --red: #ff9387;
+      --red-soft: rgba(255, 147, 135, 0.12);
+      --blue: #8bb8ff;
+      --blue-soft: rgba(139, 184, 255, 0.12);
+      --purple: #c8a8ff;
+      --purple-soft: rgba(200, 168, 255, 0.12);
+      --shadow: 0 22px 70px rgba(0, 0, 0, 0.25);
+      --radius: 18px;
+      --radius-sm: 12px;
+      --content: 1180px;
+    }
+
+    html[data-theme="light"] {
+      color-scheme: light;
+      --bg: #eff6f3;
+      --bg-raised: #f7fbf9;
+      --panel: #ffffff;
+      --panel-strong: #eef7f5;
+      --ink: #12252b;
+      --muted: #536a73;
+      --faint: #6f858d;
+      --line: rgba(29, 69, 77, 0.15);
+      --line-strong: rgba(15, 133, 115, 0.35);
+      --accent: #087f70;
+      --accent-soft: rgba(8, 127, 112, 0.09);
+      --accent-ink: #ffffff;
+      --amber: #9a6509;
+      --amber-soft: rgba(154, 101, 9, 0.09);
+      --red: #b33c31;
+      --red-soft: rgba(179, 60, 49, 0.08);
+      --blue: #2d64a8;
+      --blue-soft: rgba(45, 100, 168, 0.08);
+      --purple: #7248a4;
+      --purple-soft: rgba(114, 72, 164, 0.08);
+      --shadow: 0 22px 70px rgba(39, 80, 76, 0.11);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 98px;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 82% 4%, rgba(104, 217, 199, 0.12), transparent 28rem),
+        linear-gradient(var(--bg), var(--bg));
+      color: var(--ink);
+      font-family: "Segoe UI", "Microsoft YaHei UI", "PingFang SC", "Noto Sans SC", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.2;
+      background-image:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size: 36px 36px;
+      mask-image: linear-gradient(to bottom, black, transparent 75%);
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+    }
+
+    a:hover {
+      color: var(--ink);
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button,
+    .button {
+      border: 1px solid var(--line-strong);
+      background: var(--panel-strong);
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 0.62rem 0.95rem;
+      cursor: pointer;
+      transition: background 180ms ease, border-color 180ms ease, color 180ms ease, transform 180ms ease;
+    }
+
+    button:hover,
+    .button:hover {
+      border-color: var(--accent);
+      color: var(--ink);
+      transform: translateY(-1px);
+    }
+
+    button:focus-visible,
+    a:focus-visible,
+    input:focus-visible,
+    summary:focus-visible {
+      outline: 3px solid var(--amber);
+      outline-offset: 3px;
+    }
+
+    .button-primary {
+      background: var(--accent);
+      color: var(--accent-ink);
+      border-color: var(--accent);
+      font-weight: 650;
+    }
+
+    .button-primary:hover {
+      background: var(--ink);
+      color: var(--bg);
+      border-color: var(--ink);
+    }
+
+    .button-small {
+      padding: 0.42rem 0.72rem;
+      font-size: 0.84rem;
+    }
+
+    .shell {
+      width: min(calc(100% - 32px), var(--content));
+      margin-inline: auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(18px);
+      background: color-mix(in srgb, var(--bg) 82%, transparent);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      min-height: 70px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: var(--ink);
+      text-decoration: none;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border: 1px solid var(--line-strong);
+      border-radius: 11px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-family: "Cascadia Code", "Consolas", monospace;
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+
+    .main-nav {
+      display: flex;
+      gap: 0.3rem;
+      margin-left: auto;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .main-nav::-webkit-scrollbar {
+      display: none;
+    }
+
+    .main-nav a {
+      color: var(--muted);
+      text-decoration: none;
+      padding: 0.55rem 0.72rem;
+      border-radius: 999px;
+      white-space: nowrap;
+      font-size: 0.9rem;
+    }
+
+    .main-nav a:hover,
+    .main-nav a.active {
+      color: var(--ink);
+      background: var(--panel);
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 0.45rem;
+      flex-shrink: 0;
+    }
+
+    .icon-button {
+      width: 42px;
+      height: 42px;
+      padding: 0;
+      display: grid;
+      place-items: center;
+    }
+
+    .hero {
+      padding: 7rem 0 3.6rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(330px, 0.7fr);
+      gap: 2.4rem;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      color: var(--accent);
+      font-family: "Cascadia Code", "Consolas", monospace;
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 28px;
+      height: 1px;
+      background: currentColor;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 760px;
+      margin-bottom: 1.2rem;
+      font-size: clamp(2.6rem, 7vw, 5.7rem);
+      line-height: 1.02;
+      letter-spacing: -0.055em;
+      font-weight: 720;
+    }
+
+    .gradient-text {
+      color: var(--accent);
+      background: linear-gradient(115deg, var(--accent), var(--blue), var(--amber));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-lead {
+      max-width: 700px;
+      font-size: clamp(1.03rem, 2.1vw, 1.22rem);
+      color: var(--muted);
+    }
+
+    .hero-lead strong {
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.7rem;
+      margin-top: 1.6rem;
+    }
+
+    .hero-panel {
+      position: relative;
+      background: linear-gradient(145deg, var(--panel-strong), var(--panel));
+      border: 1px solid var(--line-strong);
+      border-radius: 26px;
+      padding: 1.3rem;
+      box-shadow: var(--shadow);
+    }
+
+    .hero-panel::after {
+      content: "PARAMETRIC / VERIFIED";
+      position: absolute;
+      right: 1rem;
+      bottom: 0.65rem;
+      color: var(--faint);
+      font-family: "Cascadia Code", "Consolas", monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+    }
+
+    .part-sketch {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .part-sketch .cut {
+      fill: var(--accent-soft);
+      stroke: var(--accent);
+      stroke-width: 1.5;
+    }
+
+    .part-sketch .dim {
+      fill: none;
+      stroke: var(--amber);
+      stroke-width: 1;
+    }
+
+    .part-sketch .hidden-line {
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 1;
+      stroke-dasharray: 5 5;
+    }
+
+    .part-sketch text {
+      fill: var(--ink);
+      font-family: "Cascadia Code", "Consolas", monospace;
+      font-size: 10px;
+    }
+
+    .part-sketch text.tiny {
+      fill: var(--muted);
+      font-size: 8px;
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.55rem;
+      margin-top: 0.8rem;
+    }
+
+    .mini-stat {
+      padding: 0.8rem;
+      border-radius: 13px;
+      background: color-mix(in srgb, var(--panel) 82%, transparent);
+      border: 1px solid var(--line);
+    }
+
+    .mini-stat span {
+      display: block;
+      color: var(--faint);
+      font-size: 0.73rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .mini-stat strong {
+      display: block;
+      margin-top: 0.18rem;
+      font-size: 0.88rem;
+      color: var(--ink);
+      font-weight: 580;
+    }
+
+    .status-ribbon {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      margin-top: 1.1rem;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      border-radius: 999px;
+      padding: 0.33rem 0.68rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+      background: var(--panel);
+      border: 1px solid var(--line);
+    }
+
+    .pill::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .pill.accent {
+      color: var(--accent);
+      border-color: var(--line-strong);
+      background: var(--accent-soft);
+    }
+
+    .pill.amber {
+      color: var(--amber);
+      border-color: color-mix(in srgb, var(--amber) 38%, transparent);
+      background: var(--amber-soft);
+    }
+
+    .section {
+      padding: 4.4rem 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(280px, 0.7fr);
+      gap: 2rem;
+      align-items: end;
+      margin-bottom: 2rem;
+    }
+
+    .section-index {
+      color: var(--accent);
+      font-family: "Cascadia Code", "Consolas", monospace;
+      font-size: 0.78rem;
+      letter-spacing: 0.11em;
+      margin-bottom: 0.65rem;
+    }
+
+    h2 {
+      margin-bottom: 0.65rem;
+      font-size: clamp(1.9rem, 4vw, 3.15rem);
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+      font-weight: 700;
+    }
+
+    .section-head p {
+      margin-bottom: 0;
+      color: var(--muted);
+    }
+
+    .panel {
+      background: linear-gradient(145deg, var(--panel), var(--bg-raised));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: clamp(1rem, 3vw, 1.7rem);
+    }
+
+    .callout {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.95rem;
+      padding: 1rem 1.15rem;
+      border-radius: var(--radius-sm);
+      background: var(--amber-soft);
+      border: 1px solid color-mix(in srgb, var(--amber) 28%, transparent);
+      color: var(--ink);
+    }
+
+    .callout-mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      color: var(--amber);
+      border: 1px solid currentColor;
+      font-family: "Cascadia Code", "Consolas", monospace;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+
+    .callout p {
+      margin-bottom: 0;
+      color: var(--muted);
+    }
+
+    .callout strong {
+      color: var(--ink);
+    }
+
+    .reality-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+      margin-top: 1.2rem;
+    }
+
+    .overview-tools {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .reality-card {
+      position: relative;
+      min-height: 210px;
+      padding: 1.25rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: var(--panel);
+      overflow: hidden;
+    }
+
+    .reality-card::before {
+      content: attr(data-index);
+      position: absolute;
+      right: 0.8rem;
+      top: 0.2rem;
+      font-size: 4rem;
+      line-height: 1;
+      font-weight: 800;
+      color: var(--line);
+    }
+
+    .reality-card h3 {
+      margin-bottom: 0.55rem;
+      font-size: 1.05rem;
+    }
+
+    .reality-card p {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 0.21rem 0.52rem;
+      border-radius: 6px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.73rem;
+      line-height: 1.4;
+    }
+
+    .tag.amber {
+      color: var(--amber);
+      background: var(--amber-soft);
+    }
+
+    .tag.red {
+      color: var(--red);
+      background: var(--red-soft);
+    }
+
+    .tag.blue {
+      color: var(--blue);
+      background: var(--blue-soft);
+    }
+
+    .tag.purple {
+      color: var(--purple);
+      background: var(--purple-soft);
+    }
+
+    .progress-dashboard {
+      display: grid;
+      grid-template-columns: 175px 1fr;
+      align-items: center;
+      gap: 1.5rem;
+      margin-top: 1.2rem;
+    }
+
+    .progress-ring {
+      --progress: 0;
+      width: 155px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: conic-gradient(var(--accent) calc(var(--progress) * 1%), var(--panel-strong) 0);
+      position: relative;
+      transition: background 250ms ease;
+    }
+
+    .progress-ring::before {
+      content: "";
+      position: absolute;
+      inset: 12px;
+      border-radius: 50%;
+      background: var(--panel);
+    }
+
+    .progress-ring-content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+    }
+
+    .progress-ring-content strong {
+      display: block;
+      font-size: 2.15rem;
+      line-height: 1;
+      font-weight: 720;
+    }
+
+    .progress-ring-content span {
+      color: var(--muted);
+      font-size: 0.76rem;
+    }
+
+    .progress-copy h3 {
+      margin-bottom: 0.4rem;
+    }
+
+    .progress-copy p {
+      color: var(--muted);
+      margin-bottom: 0.8rem;
+    }
+
+    .progress-track {
+      height: 8px;
+      border-radius: 999px;
+      background: var(--panel-strong);
+      overflow: hidden;
+      margin-bottom: 0.55rem;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--accent), var(--blue));
+      transition: width 250ms ease;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .map-tabs {
+      display: inline-flex;
+      padding: 4px;
+      margin: 1.25rem 0 1.4rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel);
+    }
+
+    .map-tab {
+      border: 0;
+      background: transparent;
+      border-radius: 999px;
+      padding: 0.54rem 0.88rem;
+    }
+
+    .map-tab[aria-selected="true"] {
+      background: var(--accent);
+      color: var(--accent-ink);
+    }
+
+    .map-panel[hidden] {
+      display: none;
+    }
+
+    .timeline {
+      position: relative;
+      display: grid;
+      gap: 0.85rem;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 29px;
+      top: 24px;
+      bottom: 24px;
+      width: 1px;
+      background: linear-gradient(var(--accent), var(--line));
+    }
+
+    .step-card {
+      position: relative;
+      display: grid;
+      grid-template-columns: 58px minmax(0, 1fr) auto;
+      gap: 1rem;
+      align-items: start;
+      padding: 1.15rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+    }
+
+    .step-card.done {
+      border-color: var(--line-strong);
+      background: linear-gradient(115deg, var(--accent-soft), var(--panel) 55%);
+    }
+
+    .step-number {
+      position: relative;
+      z-index: 1;
+      width: 58px;
+      height: 58px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: var(--panel-strong);
+      border: 1px solid var(--line);
+      color: var(--accent);
+      font-family: "Cascadia Code", "Consolas", monospace;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .step-card.done .step-number {
+      background: var(--accent);
+      color: var(--accent-ink);
+    }
+
+    .step-card h3 {
+      margin-bottom: 0.35rem;
+      font-size: 1.08rem;
+    }
+
+    .step-card p {
+      margin-bottom: 0.55rem;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .step-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+    }
+
+    .text-link {
+      color: var(--accent);
+      background: var(--accent-soft);
+      padding: 0.23rem 0.5rem;
+      border-radius: 5px;
+      font-size: 0.78rem;
+      text-decoration: none;
+    }
+
+    .text-link.amber {
+      color: var(--amber);
+      background: var(--amber-soft);
+    }
+
+    .text-link.video {
+      color: var(--red);
+      background: var(--red-soft);
+    }
+
+    .step-time {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 0.22rem 0.55rem;
+      color: var(--muted);
+      font-size: 0.75rem;
+      white-space: nowrap;
+    }
+
+    .check-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      color: var(--muted);
+      font-size: 0.79rem;
+      margin-top: 0.75rem;
+    }
+
+    .check-wrap input {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 5px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-strong);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+    }
+
+    .check-wrap input::after {
+      content: "✓";
+      font-size: 0.72rem;
+      color: var(--accent-ink);
+      display: none;
+    }
+
+    .check-wrap input:checked {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .check-wrap input:checked::after {
+      display: block;
+    }
+
+    .weekend-note {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.7rem;
+      margin-top: 1rem;
+    }
+
+    .weekend-note div {
+      border: 1px solid var(--line);
+      background: var(--bg-raised);
+      border-radius: var(--radius-sm);
+      padding: 0.9rem;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .weekend-note strong {
+      display: block;
+      color: var(--ink);
+      margin-bottom: 0.2rem;
+    }
+
+    .pipeline-layout {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.62fr) minmax(0, 1fr);
+      gap: 1rem;
+      align-items: stretch;
+    }
+
+    .pipeline-steps {
+      display: grid;
+      gap: 0.55rem;
+    }
+
+    .pipe-step {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.8rem;
+      align-items: center;
+      text-align: left;
+      border-radius: var(--radius-sm);
+      padding: 0.8rem;
+      background: var(--panel);
+      color: var(--muted);
+      border-color: var(--line);
+    }
+
+    .pipe-step[aria-pressed="true"] {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--ink);
+    }
+
+    .pipe-step .num {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: var(--panel-strong);
+      color: var(--accent);
+      font-family: "Cascadia Code", "Consolas", monospace;
+      font-size: 0.78rem;
+    }
+
+    .pipe-step strong {
+      display: block;
+      color: var(--ink);
+      font-size: 0.91rem;
+    }
+
+    .pipe-step small {
+      display: block;
+      color: var(--faint);
+      font-size: 0.74rem;
+    }
+
+    .pipe-detail {
+      min-height: 100%;
+      border-radius: var(--radius);
+      border: 1px solid var(--line-strong);
+      background:
+        linear-gradient(145deg, var(--accent-soft), transparent 45%),
+        var(--panel);
+      padding: 1.4rem;
+    }
+
+    .pipe-detail-kicker {
+      color: var(--accent);
+      font-family: "Cascadia Code", "Consolas", monospace;
+      font-size: 0.74rem;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.7rem;
+    }
+
+    .pipe-detail h3 {
+      margin-bottom: 0.6rem;
+      font-size: 1.35rem;
+    }
+
+    .pipe-detail p {
+      color: var(--muted);
+    }
+
+    .pipe-detail ul {
+      margin: 1rem 0 0;
+      padding-left: 1.1rem;
+      color: var(--muted);
+    }
+
+    .pipe-detail li {
+      margin-bottom: 0.4rem;
+    }
+
+    .gate-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.7rem;
+      margin-top: 1rem;
+    }
+
+    .gate {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      padding: 0.85rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .gate span {
+      color: var(--faint);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .gate strong {
+      display: block;
+      font-size: 0.91rem;
+      margin-top: 0.2rem;
+    }
+
+    .deploy-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 1rem;
+    }
+
+    .deploy-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      padding: 1.15rem;
+    }
+
+    .deploy-card h3 {
+      margin-bottom: 0.6rem;
+    }
+
+    .deploy-card ol {
+      margin: 0;
+      padding-left: 1.2rem;
+      color: var(--muted);
+    }
+
+    .deploy-card li {
+      margin-bottom: 0.55rem;
+    }
+
+    .code-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin: 0.8rem 0 0.45rem;
+    }
+
+    .code-box {
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin: 0;
+      padding: 0.85rem;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--bg);
+      color: var(--blue);
+      font-family: "Cascadia Code", "Consolas", monospace;
+      font-size: 0.78rem;
+      line-height: 1.6;
+      overflow: auto;
+    }
+
+    .prompt-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.9rem;
+    }
+
+    .prompt-card {
+      position: relative;
+      padding: 1rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+    }
+
+    .prompt-card header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 1rem;
+      margin-bottom: 0.7rem;
+    }
+
+    .prompt-card h3 {
+      margin: 0;
+      font-size: 0.98rem;
+    }
+
+    .prompt-card pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin: 0;
+      padding: 0.85rem;
+      border-radius: 9px;
+      background: var(--bg);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-family: "Cascadia Code", "Consolas", "Microsoft YaHei UI", monospace;
+      font-size: 0.77rem;
+      line-height: 1.6;
+      max-height: 260px;
+      overflow: auto;
+    }
+
+    .copy-state {
+      min-height: 1.2em;
+      margin-top: 0.45rem;
+      font-size: 0.76rem;
+      color: var(--accent);
+    }
+
+    .tool-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.9rem;
+    }
+
+    .tool-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 1rem;
+      padding: 1.15rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+    }
+
+    .tool-card h3 {
+      margin-bottom: 0.3rem;
+      font-size: 1.06rem;
+    }
+
+    .tool-card p {
+      margin-bottom: 0.55rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .tool-fit {
+      align-self: start;
+      text-align: right;
+      color: var(--faint);
+      font-size: 0.74rem;
+      white-space: nowrap;
+    }
+
+    .tool-fit strong {
+      display: block;
+      color: var(--accent);
+      font-size: 0.9rem;
+    }
+
+    .risk-panel {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 1rem;
+    }
+
+    .risk-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 0.55rem;
+    }
+
+    .risk-list li {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 0.7rem;
+      align-items: start;
+      padding: 0.8rem;
+      border-radius: var(--radius-sm);
+      background: var(--red-soft);
+      border: 1px solid color-mix(in srgb, var(--red) 22%, transparent);
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .risk-list li::before {
+      content: "!";
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      color: var(--red);
+      border: 1px solid currentColor;
+      font-family: "Cascadia Code", "Consolas", monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+
+    .validation-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .validation-table th,
+    .validation-table td {
+      text-align: left;
+      padding: 0.8rem 0.65rem;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    .validation-table th {
+      color: var(--faint);
+      font-weight: 560;
+      font-size: 0.76rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .validation-table td {
+      color: var(--muted);
+    }
+
+    .validation-table td strong {
+      color: var(--ink);
+      font-weight: 570;
+    }
+
+    .score-panel {
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: var(--radius-sm);
+      background: var(--blue-soft);
+      border: 1px solid color-mix(in srgb, var(--blue) 26%, transparent);
+    }
+
+    .score-formula {
+      font-family: "Cascadia Code", "Consolas", "Microsoft YaHei UI", monospace;
+      color: var(--blue);
+      font-size: 0.9rem;
+    }
+
+    .resource-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.38rem;
+    }
+
+    .filter-button {
+      padding: 0.42rem 0.7rem;
+      font-size: 0.8rem;
+    }
+
+    .filter-button[aria-pressed="true"] {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--accent-ink);
+    }
+
+    .resource-search {
+      flex: 1;
+      min-width: 220px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel);
+      color: var(--ink);
+      padding: 0.6rem 0.9rem;
+    }
+
+    .resource-search::placeholder {
+      color: var(--faint);
+    }
+
+    .resource-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+    }
+
+    .resource-card {
+      display: flex;
+      flex-direction: column;
+      min-height: 180px;
+      padding: 1rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    .resource-card[hidden] {
+      display: none;
+    }
+
+    .resource-card .meta {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .resource-card h3 {
+      font-size: 0.96rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .resource-card p {
+      font-size: 0.83rem;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    .resource-card .resource-link {
+      margin-top: auto;
+      align-self: flex-start;
+      font-size: 0.82rem;
+      font-weight: 620;
+    }
+
+    .resource-empty {
+      padding: 1.2rem;
+      border: 1px dashed var(--line);
+      border-radius: var(--radius-sm);
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .glossary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.7rem;
+    }
+
+    .glossary details {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      padding: 0.85rem 1rem;
+    }
+
+    .glossary summary {
+      cursor: pointer;
+      color: var(--ink);
+      font-weight: 580;
+    }
+
+    .glossary p {
+      color: var(--muted);
+      font-size: 0.86rem;
+      margin: 0.65rem 0 0;
+    }
+
+    .final-callout {
+      margin-top: 1rem;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 1.5rem;
+      border-radius: var(--radius);
+      background:
+        linear-gradient(120deg, var(--accent-soft), transparent 65%),
+        var(--panel);
+      border: 1px solid var(--line-strong);
+      padding: 1.3rem;
+    }
+
+    .final-callout h3 {
+      margin-bottom: 0.4rem;
+      font-size: 1.25rem;
+    }
+
+    .final-callout p {
+      margin-bottom: 0;
+      color: var(--muted);
+    }
+
+    footer {
+      padding: 2.5rem 0 3.5rem;
+      border-top: 1px solid var(--line);
+      color: var(--faint);
+      font-size: 0.8rem;
+    }
+
+    .footer-grid {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: start;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .footer-grid p {
+      max-width: 760px;
+      margin-bottom: 0;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 1000px) {
+      .main-nav {
+        display: none;
+      }
+
+      .top-actions {
+        margin-left: auto;
+      }
+
+      .hero-grid,
+      .section-head {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        padding-top: 4.5rem;
+      }
+
+      .hero-panel {
+        max-width: 620px;
+      }
+
+      .reality-grid,
+      .resource-grid,
+      .glossary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .gate-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .pipeline-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      body {
+        font-size: 15px;
+      }
+
+      .shell {
+        width: min(calc(100% - 22px), var(--content));
+      }
+
+      .hero {
+        padding-top: 3.6rem;
+      }
+
+      h1 {
+        font-size: clamp(2.35rem, 13vw, 4rem);
+      }
+
+      .section {
+        padding: 3.2rem 0;
+      }
+
+      .reality-grid,
+      .weekend-note,
+      .prompt-grid,
+      .tool-grid,
+      .risk-panel,
+      .resource-grid,
+      .glossary,
+      .gate-grid,
+      .deploy-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .progress-dashboard {
+        grid-template-columns: 1fr;
+      }
+
+      .progress-ring {
+        width: 132px;
+      }
+
+      .step-card {
+        grid-template-columns: 48px minmax(0, 1fr);
+        gap: 0.75rem;
+      }
+
+      .step-number {
+        width: 48px;
+        height: 48px;
+      }
+
+      .step-time {
+        grid-column: 2;
+        justify-self: start;
+      }
+
+      .timeline::before {
+        left: 24px;
+      }
+
+      .tool-card {
+        grid-template-columns: 1fr;
+      }
+
+      .tool-fit {
+        text-align: left;
+      }
+
+      .final-callout {
+        grid-template-columns: 1fr;
+      }
+
+      .validation-table {
+        min-width: 660px;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .brand span:last-child {
+        max-width: 125px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .hero-stats {
+        grid-template-columns: 1fr;
+      }
+
+      .map-tabs {
+        display: flex;
+        width: 100%;
+      }
+
+      .map-tab {
+        flex: 1;
+      }
+
+      .section-head {
+        gap: 0.6rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+      }
+    }
+
+    @media print {
+      :root {
+        --bg: #fff;
+        --panel: #fff;
+        --panel-strong: #f4f4f4;
+        --ink: #111;
+        --muted: #333;
+        --faint: #555;
+        --line: #ccc;
+        --line-strong: #999;
+        --accent: #075f55;
+      }
+
+      body::before,
+      .topbar,
+      .hero-actions,
+      .map-tabs,
+      .resource-controls,
+      .copy-button,
+      .icon-button {
+        display: none !important;
+      }
+
+      .hero {
+        padding: 1rem 0;
+      }
+
+      .hero-grid,
+      .section-head {
+        grid-template-columns: 1fr;
+      }
+
+      .section,
+      .hero {
+        break-inside: avoid;
+      }
+
+      .map-panel[hidden] {
+        display: block;
+      }
+
+      a {
+        color: #111;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="sr-only" href="#main">跳到主要内容</a>
+
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <a class="brand" href="#top" aria-label="返回顶部">
+        <span class="brand-mark">CAD+AI</span>
+        <span>工程图转模地图</span>
+      </a>
+      <nav class="main-nav" aria-label="页面导航">
+        <a href="#overview">认知</a>
+        <a href="#weekend">周末路线</a>
+        <a href="#pipeline">工作流</a>
+        <a href="#deploy">部署</a>
+        <a href="#tools">工具</a>
+        <a href="#validation">校验</a>
+        <a href="#resources">资源</a>
+      </nav>
+      <div class="top-actions">
+        <button class="icon-button" id="theme-toggle" type="button" aria-label="切换明暗主题" title="切换明暗主题">◐</button>
+        <button class="icon-button" type="button" onclick="window.print()" aria-label="打印当前页面" title="打印">⌘</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="shell hero-grid">
+        <div>
+          <div class="eyebrow">Learning map · verified 2026.10.24</div>
+          <h1>AI 不是替你<br><span class="gradient-text">画完图</span>，<br>而是帮你更快做对。</h1>
+          <p class="hero-lead">
+            面向你的真实工作：把<strong>可选中文字的二维工程图 PDF</strong>重建为可编辑的 SolidWorks 参数化零件，同时保留人工尺寸裁决、过程记录与结果校验。先用一个周末看懂入口，再按五个质量门把它做成可工作的半自动流程。
+          </p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#weekend">开始周末路线</a>
+            <a class="button" href="#pipeline">查看落地流程</a>
+            <a class="button" href="#resources">打开资源清单</a>
+          </div>
+          <div class="status-ribbon">
+            <span class="pill accent">原生 PDF 优先</span>
+            <span class="pill">目标：可编辑特征树</span>
+            <span class="pill amber">人工复核是质量门</span>
+            <span class="pill">预算：试用优先</span>
+          </div>
+        </div>
+
+        <aside class="hero-panel" aria-label="你的学习配置与输入输出示意">
+          <svg class="part-sketch" viewBox="0 0 420 255" role="img" aria-labelledby="part-title part-desc">
+            <title id="part-title">零件工程图与 AI 辅助建模流程示意</title>
+            <desc id="part-desc">一张带尺寸的支架工程图经过尺寸清单、特征规划和参数化建模，最后进入尺寸校验。</desc>
+            <rect x="36" y="45" width="144" height="104" rx="8" class="cut"></rect>
+            <circle cx="67" cy="75" r="8" class="cut"></circle>
+            <circle cx="149" cy="75" r="8" class="cut"></circle>
+            <circle cx="67" cy="119" r="8" class="cut"></circle>
+            <circle cx="149" cy="119" r="8" class="cut"></circle>
+            <path d="M36 170 H180" class="dim"></path>
+            <path d="M36 164 V176 M180 164 V176" class="dim"></path>
+            <text x="91" y="188">120 ±0.1</text>
+            <path d="M193 45 V149" class="dim"></path>
+            <path d="M187 45 H199 M187 149 H199" class="dim"></path>
+            <text x="204" y="101">80</text>
+            <path d="M54 45 V30 H162 V45" class="hidden-line"></path>
+            <text x="43" y="25" class="tiny">A-A</text>
+
+            <path d="M218 97 H252" class="dim"></path>
+            <path d="M247 92 L256 97 L247 102" class="dim"></path>
+            <text x="224" y="86">提取</text>
+            <text x="224" y="118">规划</text>
+            <text x="224" y="138">建模</text>
+
+            <rect x="266" y="34" width="118" height="80" rx="8" class="cut"></rect>
+            <circle cx="290" cy="58" r="5" class="cut"></circle>
+            <circle cx="360" cy="58" r="5" class="cut"></circle>
+            <circle cx="290" cy="92" r="5" class="cut"></circle>
+            <circle cx="360" cy="92" r="5" class="cut"></circle>
+            <path d="M266 127 H384" class="dim"></path>
+            <path d="M266 121 V133 M384 121 V133" class="dim"></path>
+            <text x="312" y="145">PARAMETRIC</text>
+            <path d="M325 158 V181" class="dim"></path>
+            <path d="M320 176 L325 185 L330 176" class="dim"></path>
+            <text x="268" y="205">尺寸 / 孔位 / 体重建</text>
+            <text x="52" y="235" class="tiny">SOURCE DRAWING</text>
+            <text x="286" y="235" class="tiny">VERIFIED MODEL</text>
+          </svg>
+
+          <div class="hero-stats">
+            <div class="mini-stat"><span>当前基础</span><strong>SW 熟练 / 编程零基础</strong></div>
+            <div class="mini-stat"><span>主机</span><strong>R9 8940HX · RTX 5060 · 16GB</strong></div>
+            <div class="mini-stat"><span>主输入</span><strong>原生工程图 PDF</strong></div>
+            <div class="mini-stat"><span>学习节奏</span><strong>8 小时入口 + 后续迭代</strong></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section" id="overview">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="section-index">00 / MENTAL MODEL</div>
+            <h2>先建立正确的“AI 建模”模型</h2>
+          </div>
+          <p>AI 的强项是读文、归纳、规划与写代码；CAD 的内核只认明确几何与约束。把两者接起来，关键是“让 AI 提出方案，让 CAD 执行，让校验决定是否通过”。</p>
+        </div>
+
+        <div class="callout">
+          <div class="callout-mark">!</div>
+          <p><strong>最重要的一句话：</strong>工程图转三维不是“文件转换”。图只定义了若干视图、尺寸、公差与设计意图，模型还必须补齐隐藏结构、特征顺序与参数关系，所以最终模型必须可编辑、可追溯、可验证。</p>
+        </div>
+
+        <div class="reality-grid">
+          <article class="reality-card" data-index="01">
+            <div class="tag-row"><span class="tag">理解</span><span class="tag blue">尺寸归属</span></div>
+            <h3>AI 先做“审图员”</h3>
+            <p>把每一个尺寸变成结构化记录：数值、上下偏差、单位、属于哪个视图、约束哪个几何、是否存在冲突或缺失。</p>
+            <div class="tag-row"><span class="tag amber">不要直接生成</span><span class="tag">先要清单</span></div>
+          </article>
+          <article class="reality-card" data-index="02">
+            <div class="tag-row"><span class="tag">规划</span><span class="tag purple">特征树</span></div>
+            <h3>再做“工艺规划员”</h3>
+            <p>先决定基准面、草图轮廓、主体、孔、槽、阵列、倒角与圆角顺序，并给关键尺寸起稳定名称。</p>
+            <div class="tag-row"><span class="tag">重建特征</span><span class="tag">命名参数</span></div>
+          </article>
+          <article class="reality-card" data-index="03">
+            <div class="tag-row"><span class="tag red">执行</span><span class="tag">CAD API</span></div>
+            <h3>最后才“动手建模”</h3>
+            <p>让 AI CAD 工具或 SolidWorks API 执行明确步骤。模型通过包络、体积、孔位、孔径和重建测试后，才算完成。</p>
+            <div class="tag-row"><span class="tag amber">人工签核</span><span class="tag">不可跳步</span></div>
+          </article>
+        </div>
+
+        <div class="panel" style="margin-top:1rem">
+          <div class="section-index" style="margin-bottom:.4rem">2026 工具格局</div>
+          <div class="reality-grid overview-tools" style="margin-top:.6rem">
+            <div>
+              <h3>图纸 → CAD</h3>
+              <p style="color:var(--muted);font-size:.88rem">Backflip 的 Drawing to CAD、Adam 的 2D Drawing to 3D 都已把“带尺寸图纸”作为入口，但仍需人工处理歧义。</p>
+            </div>
+            <div>
+              <h3>CAD 智能体</h3>
+              <p style="color:var(--muted);font-size:.88rem">Adam 宣称可通过 Windows connector 在运行中的 SolidWorks 里检查与修改模型；这是“操作现有 CAD”，不是替代许可证。</p>
+            </div>
+            <div>
+              <h3>代码化 CAD</h3>
+              <p style="color:var(--muted);font-size:.88rem">Zoo 的 Zookeeper 与 SolidWorks API 路线，都把自然语言或参数转成可编辑几何和特征。程序化路线可控，但需要测试。</p>
+            </div>
+            <div>
+              <h3>网格生成分支</h3>
+              <p style="color:var(--muted);font-size:.88rem">图片或草图生成 Blender / Meshy 模型，适合外观与概念，不适合作为精密工程图尺寸的唯一来源。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout" style="margin-top:1rem;background:var(--red-soft);border-color:color-mix(in srgb,var(--red) 28%,transparent)">
+          <div class="callout-mark" style="color:var(--red)">!</div>
+          <p><strong>关于“免费版 / 盗版 SolidWorks 2025”：</strong>它不是官方免费永久版。功能缺失、联网连接器拒接、宏或 API 失效、插件与安全风险都必须计入。商业 AI 连接器通常按“正常运行的授权 SolidWorks”设计；在没有合法授权的环境中，优先用本机宏录制、Python API 试验和隔离环境，不要把关键成果依赖在来源不明的插件上。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="weekend">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="section-index">01 / QUICK ENTRY</div>
+            <h2>一个周末看懂 AI 建模入口</h2>
+          </div>
+          <p>目标不是“学完开发”，而是亲手完成一轮：读图、拆尺寸、人工规划、试用 AI、记录失败、知道下一步怎么优化。官方文档 + 2 个视频 + 3 个实物练习即可。</p>
+        </div>
+
+        <div class="progress-dashboard panel">
+          <div class="progress-ring" id="progress-ring" aria-hidden="true">
+            <div class="progress-ring-content">
+              <strong id="progress-number">0%</strong>
+              <span>学习进度</span>
+            </div>
+          </div>
+          <div class="progress-copy">
+            <h3>你的进度存在本机浏览器</h3>
+            <p>勾选完成项后会自动保存。周末路线和工作级流程共用进度；不需要账号，也不会上传任何图纸。</p>
+            <div class="progress-track" role="progressbar" aria-label="学习进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress-track">
+              <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div class="progress-meta">
+              <span id="progress-label">已完成 0 / 0 项</span>
+              <button class="button button-small" id="reset-progress" type="button">清空进度</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="map-tabs" role="tablist" aria-label="学习路线切换">
+          <button class="map-tab" id="tab-weekend" role="tab" aria-selected="true" aria-controls="panel-weekend" type="button">周末 8 小时</button>
+          <button class="map-tab" id="tab-work" role="tab" aria-selected="false" aria-controls="panel-work" type="button">工作级路线</button>
+        </div>
+
+        <div class="map-panel" id="panel-weekend" role="tabpanel" aria-labelledby="tab-weekend">
+          <div class="timeline">
+            <article class="step-card" data-task-card="w1">
+              <div class="step-number">01</div>
+              <div>
+                <h3>先看“工程图到底表达什么”</h3>
+                <p>看 10 分钟读图视频，同时用纸笔圈出主视图、剖视图、基准、尺寸链、标题栏。你已会建模，这一轮只训练“把图纸拆成工程输入”。</p>
+                <div class="step-links">
+                  <a class="text-link video" href="https://www.youtube.com/watch?v=32CXeJVgiLA" target="_blank" rel="noopener noreferrer">视频：工程图如何让加工者读懂 ↗</a>
+                  <a class="text-link" href="https://my.solidworks.com/solidworks/guide/SOLIDWORKS_Introduction_CN.pdf" target="_blank" rel="noopener noreferrer">官方 SOLIDWORKS 入门 PDF ↗</a>
+                  <a class="text-link amber" href="https://www.gdandtbasics.com/gdt-symbols/" target="_blank" rel="noopener noreferrer">GD&T 符号速查 ↗</a>
+                </div>
+                <label class="check-wrap"><input class="task-check" data-task="w1" type="checkbox"> 完成：用 3 句话说明技术图与截图有什么区别</label>
+              </div>
+              <span class="step-time">40–60 分钟</span>
+            </article>
+
+            <article class="step-card" data-task-card="w2">
+              <div class="step-number">02</div>
+              <div>
+                <h3>做一张“尺寸台账”</h3>
+                <p>选一个自己做的简单板类零件图。把尺寸、上下偏差、单位、视图与对应特征逐项抄成表格，标记“明确 / 有歧义 / 缺失”三种状态。</p>
+                <div class="step-links">
+                  <a class="text-link" href="#validation">使用页面中的尺寸台账模板</a>
+                  <a class="text-link amber" href="#prompt-audit">复制审图 Prompt</a>
+                </div>
+                <label class="check-wrap"><input class="task-check" data-task="w2" type="checkbox"> 完成：至少记录 15 个尺寸，并指出 2 个需要人工判断的地方</label>
+              </div>
+              <span class="step-time">45–60 分钟</span>
+            </article>
+
+            <article class="step-card" data-task-card="w3">
+              <div class="step-number">03</div>
+              <div>
+                <h3>先手工做“特征计划”</h3>
+                <p>不急着让 AI 建。先在 SolidWorks 里用命名参数和稳定草图做一遍，记录主体、孔、槽、阵列、圆角顺序。之后 AI 的输出必须和这份“标准答案”比较。</p>
+                <div class="step-links">
+                  <a class="text-link" href="#pipeline" data-jump-pipeline="2">查看特征规划步骤</a>
+                  <a class="text-link" href="https://my.solidworks.com/?lang=cn" target="_blank" rel="noopener noreferrer">MySolidWorks 官方社区 ↗</a>
+                </div>
+                <label class="check-wrap"><input class="task-check" data-task="w3" type="checkbox"> 完成：写出 5–8 步特征树和关键参数名</label>
+              </div>
+              <span class="step-time">60–90 分钟</span>
+            </article>
+
+            <article class="step-card" data-task-card="w4">
+              <div class="step-number">04</div>
+              <div>
+                <h3>摸清 AI 与 SolidWorks 的真实接口</h3>
+                <p>看 Macro Recorder 的第 1、2 集。先理解“手动操作 → VBA 代码 → 参数化脚本”的链条；这一步比记某个 API 名称更重要。</p>
+                <div class="step-links">
+                  <a class="text-link video" href="https://www.youtube.com/watch?v=UMT4v1pplmY" target="_blank" rel="noopener noreferrer">视频 1/6：Macro Recorder ↗</a>
+                  <a class="text-link video" href="https://www.youtube.com/watch?v=c31K9ezTnes" target="_blank" rel="noopener noreferrer">视频 2/6：在 VBA 写代码 ↗</a>
+                  <a class="text-link" href="https://help.solidworks.com/2025/english/api/sldworksapiprogguide/gettingstarted/Record_Solidworks_Macro.htm" target="_blank" rel="noopener noreferrer">官方：宏录制文档 ↗</a>
+                </div>
+                <label class="check-wrap"><input class="task-check" data-task="w4" type="checkbox"> 完成：录制一个拉伸宏，并读出其中 3 个参数</label>
+              </div>
+              <span class="step-time">60–90 分钟</span>
+            </article>
+
+            <article class="step-card" data-task-card="w5">
+              <div class="step-number">05</div>
+              <div>
+                <h3>用同一张图测试 1–2 个 AI 入口</h3>
+                <p>分别试用 Adam 的 2D Drawing to 3D 和 Backflip 的 Drawing to CAD（如有免费额度）。输入同一张去敏图，要求先输出尺寸台账和缺失项，再建模型。不要用复杂客户图做第一次测试。</p>
+                <div class="step-links">
+                  <a class="text-link" href="https://adam.new/workflows/2d-drawing-to-3d" target="_blank" rel="noopener noreferrer">Adam：2D 图转 3D 工作流 ↗</a>
+                  <a class="text-link" href="https://www.backflip.ai/" target="_blank" rel="noopener noreferrer">Backflip：Drawing to CAD ↗</a>
+                  <a class="text-link" href="https://zoo.dev/text-to-cad" target="_blank" rel="noopener noreferrer">Zoo：对话式 CAD ↗</a>
+                </div>
+                <label class="check-wrap"><input class="task-check" data-task="w5" type="checkbox"> 完成：记录“自动完成 / 需要补问 / 明确做错”各至少 1 项</label>
+              </div>
+              <span class="step-time">60–90 分钟</span>
+            </article>
+
+            <article class="step-card" data-task-card="w6">
+              <div class="step-number">06</div>
+              <div>
+                <h3>做一次最小可运行 Bridge</h3>
+                <p>零编程也不写大系统。只做一件事：用 Python 连接本机 SolidWorks，读取当前文档标题或修改一个已有参数；失败也记录恢复步骤。先证明“脚本能控制 CAD”。</p>
+                <div class="step-links">
+                  <a class="text-link" href="https://pypi.org/project/pywin32/" target="_blank" rel="noopener noreferrer">pywin32 官方包页 ↗</a>
+                  <a class="text-link" href="https://docs.python.org/3/tutorial/" target="_blank" rel="noopener noreferrer">Python 官方教程 ↗</a>
+                  <a class="text-link" href="https://help.solidworks.com/2025/english/api/sldworksapiprogguide/Welcome.htm" target="_blank" rel="noopener noreferrer">SOLIDWORKS 2025 API ↗</a>
+                </div>
+                <label class="check-wrap"><input class="task-check" data-task="w6" type="checkbox"> 完成：在副本上跑通一次最小连接测试</label>
+              </div>
+              <span class="step-time">45–75 分钟</span>
+            </article>
+
+            <article class="step-card" data-task-card="w7">
+              <div class="step-number">07</div>
+              <div>
+                <h3>建立失败日志与基线</h3>
+                <p>不要用“看起来像”判断。比较包络尺寸、孔位、孔径、体积/质量、特征树和参数变更表现。记录 AI 节省的分钟数与人工修正的分钟数。</p>
+                <div class="step-links">
+                  <a class="text-link" href="#validation">跳到校验清单</a>
+                  <a class="text-link amber" href="#prompt-validation">复制校验 Prompt</a>
+                </div>
+                <label class="check-wrap"><input class="task-check" data-task="w7" type="checkbox"> 完成：形成一页测试记录，并写出下一步只优化哪一环</label>
+              </div>
+              <span class="step-time">30–45 分钟</span>
+            </article>
+          </div>
+
+          <div class="weekend-note">
+            <div><strong>周末成果</strong>能用同一套术语判断：AI 是在读图、规划、执行还是校验；能看懂 API 自动化入口。</div>
+            <div><strong>不要承诺</strong>一次周末后就能处理所有复杂客户图；很多难点在尺寸链、隐藏特征、公差和图版本。</div>
+            <div><strong>下一周动作</strong>选 10 张代表性零件图，只测尺寸提取与特征计划，不急着全自动生成。</div>
+          </div>
+        </div>
+
+        <div class="map-panel" id="panel-work" role="tabpanel" aria-labelledby="tab-work" hidden>
+          <div class="timeline">
+            <article class="step-card" data-task-card="p1">
+              <div class="step-number">A</div>
+              <div>
+                <h3>定任务边界与训练集</h3>
+                <p>只处理你的零件类别，先从“板类 / 支架 / 回转体 / 钣金 / 铸件”中选 2 类。每类收 10 张已有人工正确模型的图纸，形成可重复比较的基准。</p>
+                <div class="step-links"><span class="text-link">交付物：任务说明 + 20 张测试集 + 正确模型</span></div>
+                <label class="check-wrap"><input class="task-check" data-task="p1" type="checkbox"> 完成：确认输入格式、零件类别、评价标准</label>
+              </div>
+              <span class="step-time">半天</span>
+            </article>
+
+            <article class="step-card" data-task-card="p2">
+              <div class="step-number">B</div>
+              <div>
+                <h3>原生文本提取，不先做 OCR</h3>
+                <p>A 类 PDF 的尺寸文字可直接提取。保留页码、文本坐标、线框和标题栏；把 PDF 渲染成图只用于视觉核对，而不是尺寸的唯一来源。</p>
+                <div class="step-links">
+                  <a class="text-link" href="https://pypi.org/project/pdfplumber/" target="_blank" rel="noopener noreferrer">pdfplumber 文档 ↗</a>
+                  <a class="text-link" href="https://pypi.org/project/pypdf/" target="_blank" rel="noopener noreferrer">pypdf 文档 ↗</a>
+                </div>
+                <label class="check-wrap"><input class="task-check" data-task="p2" type="checkbox"> 完成：提取文本、坐标、页码，并保留原始单位</label>
+              </div>
+              <span class="step-time">1–2 天</span>
+            </article>
+
+            <article class="step-card" data-task-card="p3">
+              <div class="step-number">C</div>
+              <div>
+                <h3>尺寸台账与歧义队列</h3>
+                <p>用固定的 JSON 或 CSV 字段记录尺寸；让 AI 只做归类与疑问生成。只要缺失、冲突、单位不明或归属不清，就进入人工队列，不允许“猜着建”。</p>
+                <div class="step-links"><a class="text-link amber" href="#prompt-audit">使用审图 Prompt</a></div>
+                <label class="check-wrap"><input class="task-check" data-task="p3" type="checkbox"> 完成：一份可人工复核的台账，并标出所有不确定性</label>
+              </div>
+              <span class="step-time">1 天</span>
+            </article>
+
+            <article class="step-card" data-task-card="p4">
+              <div class="step-number">D</div>
+              <div>
+                <h3>用模板固化特征顺序</h3>
+                <p>每个零件族建立一套模板：基准面、参数命名、孔阵列、圆角规则和出图要求。AI 输出的是“参数和步骤”，不是一段不可解释的几何。</p>
+                <div class="step-links"><a class="text-link" href="#prompt-plan">使用特征规划 Prompt</a></div>
+                <label class="check-wrap"><input class="task-check" data-task="p4" type="checkbox"> 完成：每类零件至少一套可复用的特征模板</label>
+              </div>
+              <span class="step-time">2–4 天</span>
+            </article>
+
+            <article class="step-card" data-task-card="p5">
+              <div class="step-number">E</div>
+              <div>
+                <h3>接入 SolidWorks 执行</h3>
+                <p>先用自然语言 CAD 工具验证需求；需要控制与追溯时，再用 Macro Recorder 学到的 API 写参数化构建。所有自动修改先作用于副本。</p>
+                <div class="step-links">
+                  <a class="text-link" href="https://adam.new/ai-cad/solidworks" target="_blank" rel="noopener noreferrer">Adam for SOLIDWORKS ↗</a>
+                  <a class="text-link" href="https://help.solidworks.com/2025/english/api/sldworksapiprogguide/Welcome.htm" target="_blank" rel="noopener noreferrer">API 官方文档 ↗</a>
+                </div>
+                <label class="check-wrap"><input class="task-check" data-task="p5" type="checkbox"> 完成：至少一条“尺寸 → 模型”的可重复脚本或工具链</label>
+              </div>
+              <span class="step-time">1–2 周</span>
+            </article>
+
+            <article class="step-card" data-task-card="p6">
+              <div class="step-number">F</div>
+              <div>
+                <h3>自动校验与人工签核</h3>
+                <p>检查包络、关键尺寸、孔位、孔径、体积、特征重建和工程图投影。自动校验失败即回退；人工签核通过才进入正式工作目录。</p>
+                <div class="step-links"><a class="text-link" href="#validation">查看质量门</a></div>
+                <label class="check-wrap"><input class="task-check" data-task="p6" type="checkbox"> 完成：输出校验报告与人工复核记录</label>
+              </div>
+              <span class="step-time">持续</span>
+            </article>
+
+            <article class="step-card" data-task-card="p7">
+              <div class="step-number">G</div>
+              <div>
+                <h3>按“净节省时间”优化</h3>
+                <p>只有当 AI 时间 + 审核时间 + 修正时间稳定低于人工时间，才扩大自动化范围。每轮只改一个瓶颈：尺寸提取、特征规划、API 稳定性或校验。</p>
+                <div class="step-links"><a class="text-link" href="#validation">查看度量公式</a></div>
+                <label class="check-wrap"><input class="task-check" data-task="p7" type="checkbox"> 完成：一张按零件类别统计的净收益表</label>
+              </div>
+              <span class="step-time">每 2 周</span>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="pipeline">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="section-index">02 / WORKFLOW</div>
+            <h2>工作级半自动流程：七步走</h2>
+          </div>
+          <p>这条流程的目标不是“零人工”，而是把构图劳动压缩，同时把不确定性推到人面前。点击任意一步查看输入、动作与放行条件。</p>
+        </div>
+
+        <div class="pipeline-layout">
+          <div class="pipeline-steps" role="group" aria-label="七步流程">
+            <button class="pipe-step" type="button" data-pipe="0" aria-pressed="true">
+              <span class="num">01</span><span><strong>接收与版本锁定</strong><small>PDF、修订版、单位、投影</small></span>
+            </button>
+            <button class="pipe-step" type="button" data-pipe="1" aria-pressed="false">
+              <span class="num">02</span><span><strong>原生文本与几何提取</strong><small>字符、坐标、线框、视图</small></span>
+            </button>
+            <button class="pipe-step" type="button" data-pipe="2" aria-pressed="false">
+              <span class="num">03</span><span><strong>尺寸台账</strong><small>数、单位、公差、归属</small></span>
+            </button>
+            <button class="pipe-step" type="button" data-pipe="3" aria-pressed="false">
+              <span class="num">04</span><span><strong>特征计划</strong><small>基准、主体、孔、阵列、边角</small></span>
+            </button>
+            <button class="pipe-step" type="button" data-pipe="4" aria-pressed="false">
+              <span class="num">05</span><span><strong>CAD 执行</strong><small>模板、宏、API、AI Connector</small></span>
+            </button>
+            <button class="pipe-step" type="button" data-pipe="5" aria-pressed="false">
+              <span class="num">06</span><span><strong>几何校验</strong><small>包络、孔、体积、重建</small></span>
+            </button>
+            <button class="pipe-step" type="button" data-pipe="6" aria-pressed="false">
+              <span class="num">07</span><span><strong>人工签核与回写</strong><small>假设、版本、失败样本</small></span>
+            </button>
+          </div>
+
+          <div class="pipe-detail" id="pipe-detail" aria-live="polite">
+            <div class="pipe-detail-kicker" id="pipe-kicker">STEP 01 / GATE</div>
+            <h3 id="pipe-title">接收与版本锁定</h3>
+            <p id="pipe-text">先确认图纸的修订版、单位、投影法、页码与标题栏。导入不可识别或版本不一致的图，后续全部工作在错误对象上。</p>
+            <ul id="pipe-list">
+              <li>优先索取 DWG/DXF 或可搜索文本的 PDF。</li>
+              <li>记录图号、版本、日期、比例、单位与材料。</li>
+              <li>所有后续输出必须绑定原始文件哈希与页码。</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="gate-grid">
+          <div class="gate"><span>Gate A</span><strong>文本可提取吗？</strong></div>
+          <div class="gate"><span>Gate B</span><strong>尺寸归属有冲突吗？</strong></div>
+          <div class="gate"><span>Gate C</span><strong>模型能重建吗？</strong></div>
+          <div class="gate"><span>Gate D</span><strong>关键尺寸通过吗？</strong></div>
+        </div>
+
+        <div class="callout" style="margin-top:1rem">
+          <div class="callout-mark">✓</div>
+          <p><strong>推荐的生产架构：</strong>本地 PDF 文本/坐标提取 + 云端多模态模型负责歧义解释与规划 + SolidWorks 模板/API 执行 + 确定性脚本做几何与尺寸校验 + 人工签核。不要依赖“把图纸发给聊天框，模型直接吐出一个 STEP”作为唯一工作流。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="deploy">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="section-index">02B / DEPLOY</div>
+            <h2>最小可运行部署：先打通，不进生产</h2>
+          </div>
+          <p>第一版只需要验证三条链路：PDF 文字能提取、Python 能连接 SolidWorks、云端 AI 能按你的模板输出尺寸台账。三条都通，再谈自动建模。</p>
+        </div>
+
+        <div class="deploy-grid">
+          <article class="deploy-card">
+            <div class="tag-row"><span class="tag">本机底座</span><span class="tag blue">免费</span></div>
+            <h3>A. 准备 Python 与工作目录</h3>
+            <ol>
+              <li>从 <a href="https://www.python.org/downloads/windows/" target="_blank" rel="noopener noreferrer">Python 官方 Windows 下载页 ↗</a> 安装 64 位版本，安装时勾选加入 PATH。</li>
+              <li>建立独立工作目录，测试文件只放 <code>input</code>，生成文件只写 <code>output</code>，日志放 <code>logs</code>。</li>
+              <li>创建虚拟环境后安装 PDF 与 COM 连接所需包。不要让测试脚本接触正式客户目录。</li>
+            </ol>
+            <div class="code-head"><strong>PowerShell</strong><span class="tag">复制后按需调整路径</span></div>
+            <pre class="code-box">cd C:\Users\admin\Documents
+New-Item -ItemType Directory -Force ai-cad-work\input, ai-cad-work\output, ai-cad-work\logs
+py -3 -m venv C:\Users\admin\Documents\ai-cad-work\.venv
+&amp; C:\Users\admin\Documents\ai-cad-work\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install pywin32 pdfplumber pypdf</pre>
+          </article>
+
+          <article class="deploy-card">
+            <div class="tag-row"><span class="tag">连通测试</span><span class="tag amber">只读优先</span></div>
+            <h3>B. 只验证能不能连上 SolidWorks</h3>
+            <p style="color:var(--muted);font-size:.9rem">先运行一个不修改模型的最小脚本：打开 SolidWorks，读取版本号。成功后再做参数修改，而且只在副本上修改。</p>
+            <div class="code-head"><strong>Python smoke test</strong><span class="tag">不修改文件</span></div>
+            <pre class="code-box">import win32com.client
+
+sw = win32com.client.Dispatch("SldWorks.Application")
+sw.Visible = True
+
+print("Connected to SolidWorks:", sw.RevisionNumber)</pre>
+            <p style="color:var(--muted);font-size:.85rem;margin-top:.75rem">如果被拒绝或版本异常，先排查 SolidWorks 是否完整启动、安装是否被插件污染、Python 位数是否匹配，再继续写建模代码。</p>
+          </article>
+        </div>
+
+        <div class="deploy-grid" style="margin-top:1rem">
+          <article class="deploy-card">
+            <div class="tag-row"><span class="tag purple">云端入口</span><span class="tag">试用优先</span></div>
+            <h3>C. 配置一个 AI 原型</h3>
+            <ol>
+              <li>先选 Adam 或 Backflip 中的一个，不要同时深测多个产品。两者都不替代 SolidWorks 许可证。</li>
+              <li>用同一张简单、已有人工标准模型的图测试。上传前确认数据敏感性；本任务中你表示资料无隐私限制。</li>
+              <li>要求 AI 先输出尺寸台账、冲突和缺失项，再允许建模。检查单位、投影法与视图归属。</li>
+              <li>将输出导入 SolidWorks 副本，检查可编辑特征树、包络、孔系统和重建状态。</li>
+            </ol>
+            <div class="step-links">
+              <a class="text-link" href="https://adam.new/ai-cad/solidworks" target="_blank" rel="noopener noreferrer">Adam SolidWorks 入口 ↗</a>
+              <a class="text-link" href="https://www.backflip.ai/" target="_blank" rel="noopener noreferrer">Backflip 入口 ↗</a>
+            </div>
+          </article>
+
+          <article class="deploy-card">
+            <div class="tag-row"><span class="tag">保护边界</span><span class="tag red">禁止直接回写</span></div>
+            <h3>D. 通过这四条才开始扩大范围</h3>
+            <ol>
+              <li>能从 PDF 文本中提取一个已知尺寸，并保留页码与坐标。</li>
+              <li>Python 能在副本上读取或修改一个参数，失败时有恢复动作。</li>
+              <li>AI 能稳定产出约定格式的尺寸台账，而不是只给一段解释。</li>
+              <li>生成模型能做包络、孔位、孔径和重建检查，结果可保存。</li>
+            </ol>
+            <div class="callout" style="margin-top:1rem">
+              <div class="callout-mark">✓</div>
+              <p><strong>部署完成的标准：</strong>一条测试图有输入、中间台账、模型、校验结果、人工结论与耗时记录。不要用“软件装好了”和“工具能打开”冒充流程部署成功。</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="prompts">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="section-index">03 / PROMPTS</div>
+            <h2>把 AI 用成审图员，而不是许愿机</h2>
+          </div>
+          <p>每次都先索取过程性输出：尺寸台账、疑问、特征计划、校验点。提示词里明确“信息不足就停”，比要求它“一定要画出来”更可靠。</p>
+        </div>
+
+        <div class="prompt-grid">
+          <article class="prompt-card">
+            <header>
+              <h3 id="prompt-audit">1. 图纸审阅 / 尺寸台账</h3>
+              <button class="button button-small copy-button" type="button" data-copy="#prompt-audit-text">复制</button>
+            </header>
+            <pre id="prompt-audit-text">你是机械制图审图员。请只审阅我提供的二维工程图，暂不要建模，也不要猜测缺失尺寸。
+
+输出以下四部分：
+1. 图纸基本信息：图号、修订版、单位、投影法、比例、材料、视图列表。
+2. 尺寸台账：用 Markdown 表格逐项列出“尺寸编号 | 数值 | 上下偏差/公差 | 单位 | 所在视图 | 约束对象 | 明确/歧义/缺失”。
+3. 冲突列表：同一特征出现多个值、尺寸链闭合异常、视图矛盾，全部指出并引用位置。
+4. 建模前必须确认的问题：按重要性排序。
+
+原则：
+- PDF 中的可选中文字是主证据，图像只用于核对图形关系。
+- 不得根据像素比例推测未标注尺寸。
+- 不清楚的孔深度、通孔/盲孔、沉孔、倒角、圆角、阵列规则必须列为问题。
+- 最后给出一个“能否进入特征规划”的判断：可以 / 不可以，并说明原因。</pre>
+            <div class="copy-state" role="status" aria-live="polite"></div>
+          </article>
+
+          <article class="prompt-card">
+            <header>
+              <h3 id="prompt-plan">2. 特征计划</h3>
+              <button class="button button-small copy-button" type="button" data-copy="#prompt-plan-text">复制</button>
+            </header>
+            <pre id="prompt-plan-text">现在仅根据已确认的尺寸台账做建模规划，不要执行建模。
+
+请输出：
+1. 零件类型和建模策略（板类、回转体、钣金、铸件等）。
+2. 推荐的基准面和坐标原点及理由。
+3. 从基础草图到最终特征的顺序，每步包含：特征名、草图、方向、合并/切除、关键参数、依赖关系。
+4. 参数命名表：参数名、含义、标称值、单位、来源尺寸编号。
+5. 应使用阵列/镜像/方程式复用的关系，避免重复硬编码。
+6. 为保证可编辑性，哪些尺寸必须留在草图中，哪些可作为特征参数。
+7. 如果任何必要信息缺失，明确停止并列出问题，不得自行补值。
+
+目标是在 SolidWorks 中得到可重建、可改名、可改参数的专家式特征树，而不是只追求外观相似。</pre>
+            <div class="copy-state" role="status" aria-live="polite"></div>
+          </article>
+
+          <article class="prompt-card">
+            <header>
+              <h3 id="prompt-api">3. SolidWorks API / 宏脚本</h3>
+              <button class="button button-small copy-button" type="button" data-copy="#prompt-api-text">复制</button>
+            </header>
+            <pre id="prompt-api-text">你是保守的 SOLIDWORKS 2025 API 工程师。请根据已批准的特征计划和变量表编写可审查脚本。
+
+要求：
+- 不在未保存的文档或原始客户文件上执行。
+- 每一步都有命名实体和参数检查，失败立即停止并输出错误。
+- 不硬编码未批准尺寸；从集中参数表读取。
+- 标注使用的对象和方法，并链接或引用 2025 API 文档名称。
+- 先输出伪代码与风险点，等我确认后再输出完整代码。
+- 代码完成后，给出逐步重放、撤销与恢复方案。
+- 最后列出自动校验项：包络尺寸、孔数量、孔直径、孔位、体积、特征重建。
+
+当前目标：在 SolidWorks 中由已核验的尺寸台账构建可编辑参数化零件。</pre>
+            <div class="copy-state" role="status" aria-live="polite"></div>
+          </article>
+
+          <article class="prompt-card">
+            <header>
+              <h3 id="prompt-validation">4. 模型反向审图</h3>
+              <button class="button button-small copy-button" type="button" data-copy="#prompt-validation-text">复制</button>
+            </header>
+            <pre id="prompt-validation-text">你是独立的质检员。请不要为模型辩护，只按证据核验。
+
+输入：原始 PDF 的尺寸台账、模型截图/工程图、关键参数导出、体积和包络尺寸。
+输出一张检查表，逐项列出：
+- 关键尺寸：图纸值、允许偏差、模型值、误差、是否通过。
+- 特征：孔/槽/台阶/螺纹/倒角/圆角的数量和位置。
+- 设计意图：修改一个关键参数后，依赖特征是否按预期更新。
+- 重建状态：有无错误、警告、悬空草图、未定义草图。
+- 结论：PASS / REVIEW / FAIL，并写明阻断项。
+
+不要用“看起来一致”代替数值比较；如果缺少证据，就标为 UNVERIFIED。</pre>
+            <div class="copy-state" role="status" aria-live="polite"></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="tools">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="section-index">04 / TOOLS</div>
+            <h2>工具怎么选：先试入口，再决定投入</h2>
+          </div>
+          <p>你的预算适合“一个主力试用 + 免费/低成本组合”，不适合同时订阅多个产品。先拿同一张测试图比较，再决定是否付费。</p>
+        </div>
+
+        <div class="tool-grid">
+          <article class="tool-card">
+            <div>
+              <div class="tag-row"><span class="tag">主路径</span><span class="tag blue">SolidWorks</span></div>
+              <h3>Adam for SOLIDWORKS</h3>
+              <p>官方页面明确说明通过 Windows connector 连接正在运行的 SOLIDWORKS，可检查、修改和出图；实际调用 API，仍需正常软件与许可证。适合先验证“对话控制 CAD”的体验。</p>
+              <div class="step-links">
+                <a class="text-link" href="https://adam.new/ai-cad/solidworks" target="_blank" rel="noopener noreferrer">官方工作流 ↗</a>
+                <a class="text-link" href="https://adam.new/workflows/2d-drawing-to-3d" target="_blank" rel="noopener noreferrer">2D 图转 3D ↗</a>
+                <a class="text-link amber" href="https://adam.new/pricing" target="_blank" rel="noopener noreferrer">价格 ↗</a>
+              </div>
+            </div>
+            <div class="tool-fit">入口<strong>首选试用</strong></div>
+          </article>
+
+          <article class="tool-card">
+            <div>
+              <div class="tag-row"><span class="tag">图纸 → 参数化</span><span class="tag purple">作品树</span></div>
+              <h3>Backflip Drawing to CAD</h3>
+              <p>官方声称可从带尺寸工程图重建带特征树的参数化模型。当前主要入口是其网页应用与 Fusion 插件；不要假设已有可直接安装的 SolidWorks 插件，优先把输出作为对比样本。</p>
+              <div class="step-links">
+                <a class="text-link" href="https://www.backflip.ai/" target="_blank" rel="noopener noreferrer">官方入口 ↗</a>
+                <a class="text-link" href="https://www.backflip.ai/pricing" target="_blank" rel="noopener noreferrer">价格 ↗</a>
+              </div>
+            </div>
+            <div class="tool-fit">入口<strong>对比试用</strong></div>
+          </article>
+
+          <article class="tool-card">
+            <div>
+              <div class="tag-row"><span class="tag">程序化 CAD</span><span class="tag">可控</span></div>
+              <h3>Zoo Zookeeper</h3>
+              <p>对话式 CAD 智能体，强调几何引擎内的检查、调试和可编辑模型。适合理解“语言→建模代码/几何”的范式，但不是现成的 PDF 尺寸台账 + SolidWorks 一键流程。</p>
+              <div class="step-links">
+                <a class="text-link" href="https://zoo.dev/text-to-cad" target="_blank" rel="noopener noreferrer">官方说明 ↗</a>
+                <a class="text-link" href="https://zoo.dev/pricing" target="_blank" rel="noopener noreferrer">价格 ↗</a>
+              </div>
+            </div>
+            <div class="tool-fit">入口<strong>学习范式</strong></div>
+          </article>
+
+          <article class="tool-card">
+            <div>
+              <div class="tag-row"><span class="tag red">不可省</span><span class="tag">本机</span></div>
+              <h3>SolidWorks API + Python</h3>
+              <p>最值得掌握的低成本底座：Macro Recorder 暴露真实对象和方法，Python 通过 pywin32 调用。先做参数修改与检查，再逐步扩展自动建模。</p>
+              <div class="step-links">
+                <a class="text-link" href="https://help.solidworks.com/2025/english/api/sldworksapiprogguide/Welcome.htm" target="_blank" rel="noopener noreferrer">官方 API ↗</a>
+                <a class="text-link video" href="https://www.youtube.com/watch?v=UMT4v1pplmY" target="_blank" rel="noopener noreferrer">宏录制视频 ↗</a>
+              </div>
+            </div>
+            <div class="tool-fit">入口<strong>长期主力</strong></div>
+          </article>
+
+          <article class="tool-card">
+            <div>
+              <div class="tag-row"><span class="tag">逆向分支</span><span class="tag amber">需要条件</span></div>
+              <h3>FeatureWorks / 扫描数据</h3>
+              <p>逆向工程通常从扫描网格出发，目标是把网格识别成可编辑特征。它与“从二维 PDF 补出三维”是不同任务，不能只靠视觉模型替代，且依赖插件与授权。</p>
+              <div class="step-links">
+                <a class="text-link" href="https://help.solidworks.com/2025/english/api/help_list.htm?id=6" target="_blank" rel="noopener noreferrer">FeatureWorks API 入口 ↗</a>
+              </div>
+            </div>
+            <div class="tool-fit">入口<strong>副线了解</strong></div>
+          </article>
+
+          <article class="tool-card">
+            <div>
+              <div class="tag-row"><span class="tag">概念视觉</span><span class="tag purple">非精密</span></div>
+              <h3>Blender / 图片生成 3D</h3>
+              <p>适合人物、场景、外观和概念分支。生成网格可以作为沟通素材，但除非进行严格逆向重建，否则不能直接承担精密零件的尺寸和制造责任。</p>
+              <div class="step-links">
+                <a class="text-link" href="https://www.blender.org/support/tutorials/" target="_blank" rel="noopener noreferrer">Blender 官方教程 ↗</a>
+                <a class="text-link" href="https://meshy.ai/" target="_blank" rel="noopener noreferrer">Meshy ↗</a>
+              </div>
+            </div>
+            <div class="tool-fit">入口<strong>周末分支</strong></div>
+          </article>
+        </div>
+
+        <div class="callout" style="margin-top:1rem">
+          <div class="callout-mark">¥</div>
+          <p><strong>预算策略：</strong>先比较免费额度，不因演示视频直接年付。用一个简单件和一个真实复杂件分别统计：第一次可用的分钟数、关键尺寸错误数、人工修复分钟数。若一个月净节省时间仍抵不过订阅费和审核成本，就继续使用 API/宏 + 通用多模态模型。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="validation">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="section-index">05 / QUALITY GATE</div>
+            <h2>模型像不像不重要，能不能验证才重要</h2>
+          </div>
+          <p>AI 可以提出特征树，但放行权属于尺寸证据。将“正确尺寸来源”和“生成模型结果”分开保存，任何差异都要能被看见。</p>
+        </div>
+
+        <div class="risk-panel">
+          <div class="panel">
+            <h3>最容易被忽略的 8 个漏洞</h3>
+            <ul class="risk-list">
+              <li>把 PDF 截图当尺寸来源，丢失小数点或单位。</li>
+              <li>只检查外观轮廓，不检查孔深、通孔/盲孔与沉孔。</li>
+              <li>AI 猜出图纸未标的第三维，却没有把假设写回记录。</li>
+              <li>特征树能生成但重建失败，局部存在悬空或未定义草图。</li>
+              <li>尺寸都“对”，但孔位没有按基准或设计意图约束。</li>
+              <li>只做一个零件就决定采购，没有按类别评估错误率。</li>
+              <li>忽略图纸修订版、投影法、比例与公差体系。</li>
+              <li>把生成网格当成参数化 CAD，无法稳定改型。</li>
+            </ul>
+          </div>
+          <div class="panel">
+            <h3>放行前检查</h3>
+            <div class="progress-track" style="height:7px;margin:1rem 0">
+              <div class="progress-bar" id="gate-progress" style="width:0;transition:width 160ms ease"></div>
+            </div>
+            <div id="gate-checklist" style="display:grid;gap:.55rem">
+              <label class="check-wrap"><input class="gate-check" type="checkbox"> 已绑定原始图号、版本和单位</label>
+              <label class="check-wrap"><input class="gate-check" type="checkbox"> 尺寸台账已人工确认</label>
+              <label class="check-wrap"><input class="gate-check" type="checkbox"> 包络尺寸和体积通过</label>
+              <label class="check-wrap"><input class="gate-check" type="checkbox"> 所有孔径、孔数与孔位通过</label>
+              <label class="check-wrap"><input class="gate-check" type="checkbox"> 重建无错误，关键参数可改</label>
+              <label class="check-wrap"><input class="gate-check" type="checkbox"> 假设、失败与修正已记录</label>
+              <label class="check-wrap"><input class="gate-check" type="checkbox"> 人工签核后才进入正式目录</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top:1rem">
+          <div class="section-index" style="margin-bottom:.4rem">建议台账字段</div>
+          <div class="table-wrap">
+            <table class="validation-table">
+              <thead>
+                <tr><th>检查对象</th><th>图纸证据</th><th>模型证据</th><th>通过规则</th><th>失败动作</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>包络尺寸</strong></td><td>长、宽、高及单位</td><td>实体 bounding box</td><td>按图纸公差比较</td><td>停止并回溯草图/主体</td></tr>
+                <tr><td><strong>孔系统</strong></td><td>数量、直径、深度、基准与位置</td><td>拓扑 + 轴线/中心坐标</td><td>数量完全一致，位置按基准</td><td>进入人工复核</td></tr>
+                <tr><td><strong>特征可编辑性</strong></td><td>设计意图和关键参数</td><td>特征树 + 参数依赖</td><td>改关键参数依赖特征正常更新</td><td>不视为可用模型</td></tr>
+                <tr><td><strong>重建质量</strong></td><td>无直接对应项</td><td>重建状态与诊断</td><td>无未定义或悬空约束</td><td>修复或退回重规划</td></tr>
+                <tr><td><strong>体积/质量</strong></td><td>已知材料与公差</td><td>CAD 质量属性</td><td>与基准模型比较</td><td>标记异常并检查几何</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="score-panel">
+          <strong>优化指标：</strong>
+          <span class="score-formula">净节省时间 = 人工建模基线 − (AI 执行时间 + 人工审图 + 修正 + 校验)</span>
+          <p style="color:var(--muted);margin:.55rem 0 0;font-size:.88rem">不要只统计“一键生成用了多久”。真正需要优化的，是关键尺寸通过率、重建成功率、人工修复分钟数与不同零件族的可复用度。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="resources">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="section-index">06 / RESOURCE INDEX</div>
+            <h2>按学习顺序打开的资源清单</h2>
+          </div>
+          <p>链接已按“读懂→做对→接入→校验”排序。网页会变动，价格与功能以官方页面为准；本页核对日期为 2026-10-24。</p>
+        </div>
+
+        <div class="resource-controls">
+          <div class="filter-row" role="group" aria-label="资源筛选">
+            <button class="filter-button" type="button" data-filter="all" aria-pressed="true">全部</button>
+            <button class="filter-button" type="button" data-filter="official" aria-pressed="false">官方</button>
+            <button class="filter-button" type="button" data-filter="video" aria-pressed="false">视频</button>
+            <button class="filter-button" type="button" data-filter="tool" aria-pressed="false">工具</button>
+            <button class="filter-button" type="button" data-filter="free" aria-pressed="false">免费</button>
+          </div>
+          <input class="resource-search" id="resource-search" type="search" placeholder="搜索：API、读图、图纸转模、GD&T…" aria-label="搜索资源">
+        </div>
+        <div class="sr-only" id="resource-status" aria-live="polite"></div>
+
+        <div class="resource-grid" id="resource-grid">
+          <article class="resource-card" data-tags="official free solidworks drawing">
+            <div class="meta"><span class="tag">基础</span><span class="tag blue">官方</span></div>
+            <h3>SOLIDWORKS Introduction（中文 PDF）</h3>
+            <p>官方入门材料，适合补齐绘图、零件和装配的术语衔接。</p>
+            <a class="resource-link" href="https://my.solidworks.com/solidworks/guide/SOLIDWORKS_Introduction_CN.pdf" target="_blank" rel="noopener noreferrer">打开官方入门 PDF ↗</a>
+          </article>
+
+          <article class="resource-card" data-tags="video free reading drawings">
+            <div class="meta"><span class="tag red">视频</span><span class="tag">读图</span></div>
+            <h3>Engineering Drawings: How to Make Prints a Machinist Will Love</h3>
+            <p>用加工视角理解尺寸、视图、加工符号和工程图的关系。</p>
+            <a class="resource-link" href="https://www.youtube.com/watch?v=32CXeJVgiLA" target="_blank" rel="noopener noreferrer">观看 10:48 ↗</a>
+          </article>
+
+          <article class="resource-card" data-tags="free gdt reading official">
+            <div class="meta"><span class="tag">读图</span><span class="tag">GD&T</span></div>
+            <h3>GD&T Basics 符号与知识库</h3>
+            <p>查平面度、位置度、基准、最大实体等符号；特别适合把“尺寸”与“制造约束”分开。</p>
+            <a class="resource-link" href="https://www.gdandtbasics.com/gdt-symbols/" target="_blank" rel="noopener noreferrer">打开知识库 ↗</a>
+          </article>
+
+          <article class="resource-card" data-tags="official solidworks api free">
+            <div class="meta"><span class="tag blue">API</span><span class="tag blue">官方</span></div>
+            <h3>SOLIDWORKS API Help 2025</h3>
+            <p>所有支持接口、参数与示例的官方索引。遇到 AI 生成代码时，用它核对方法和对象。</p>
+            <a class="resource-link" href="https://help.solidworks.com/2025/english/api/sldworksapiprogguide/Welcome.htm" target="_blank" rel="noopener noreferrer">打开 API 首页 ↗</a>
+          </article>
+
+          <article class="resource-card" data-tags="official solidworks macro api free">
+            <div class="meta"><span class="tag">入门</span><span class="tag blue">官方</span></div>
+            <h3>Record SOLIDWORKS Macro</h3>
+            <p>理解 Macro Recorder 如何把用户操作转成 VBA 代码，这是编程自动化的最短学习桥。</p>
+            <a class="resource-link" href="https://help.solidworks.com/2025/english/api/sldworksapiprogguide/gettingstarted/Record_Solidworks_Macro.htm" target="_blank" rel="noopener noreferrer">阅读官方页 ↗</a>
+          </article>
+
+          <article class="resource-card" data-tags="video free api macro">
+            <div class="meta"><span class="tag red">视频</span><span class="tag blue">API</span></div>
+            <h3>SOLIDWORKS API for the Total Beginner · 1/6</h3>
+            <p>适合零编程起点，先理解宏录制与 API 的关系，不要求你先成为程序员。</p>
+            <a class="resource-link" href="https://www.youtube.com/watch?v=UMT4v1pplmY" target="_blank" rel="noopener noreferrer">观看 17:34 ↗</a>
+          </article>
+
+          <article class="resource-card" data-tags="video free api macro">
+            <div class="meta"><span class="tag red">视频</span><span class="tag blue">API</span></div>
+            <h3>SOLIDWORKS API for the Total Beginner · 2/6</h3>
+            <p>继续看 VBA 代码如何修改和执行，建立“录制、理解、改参数”的连续动作。</p>
+            <a class="resource-link" href="https://www.youtube.com/watch?v=c31K9ezTnes" target="_blank" rel="noopener noreferrer">观看 34:03 ↗</a>
+          </article>
+
+          <article class="resource-card" data-tags="official free python">
+            <div class="meta"><span class="tag">编程</span><span class="tag blue">官方</span></div>
+            <h3>Python 官方教程</h3>
+            <p>只看变量、列表、函数、异常和模块即可完成第一轮；不要把学习目标扩成软件工程。</p>
+            <a class="resource-link" href="https://docs.python.org/3/tutorial/" target="_blank" rel="noopener noreferrer">打开教程 ↗</a>
+          </article>
+
+          <article class="resource-card" data-tags="official free python api tool">
+            <div class="meta"><span class="tag">连接</span><span class="tag blue">工具</span></div>
+            <h3>pywin32</h3>
+            <p>Windows 下通过 COM 调用 SolidWorks 的常见方式；先在副本上做最小测试。</p>
+            <a class="resource-link" href="https://pypi.org/project/pywin32/" target="_blank" rel="noopener noreferrer">打开包页 ↗</a>
+          </article>
+
+          <article class="resource-card" data-tags="tool drawing cad ai solidworks">
+            <div class="meta"><span class="tag purple">AI 工具</span><span class="tag">SolidWorks</span></div>
+            <h3>Adam · 2D Drawing to 3D</h3>
+            <p>官方给出的带尺寸图纸转可编辑模型工作流，强调先列缺失信息、再建模、最后对照图纸检查。</p>
+            <a class="resource-link" href="https://adam.new/workflows/2d-drawing-to-3d" target="_blank" rel="noopener noreferrer">查看工作流 ↗</a>
+          </article>
+
+          <article class="resource-card" data-tags="tool drawing cad ai">
+            <div class="meta"><span class="tag purple">AI 工具</span><span class="tag">图纸转模</span></div>
+            <h3>Backflip · Drawing to CAD</h3>
+            <p>官方宣称从工程图重建带特征树的参数化 CAD；适合和 Adam 用同一图做对照试用。</p>
+            <a class="resource-link" href="https://www.backflip.ai/" target="_blank" rel="noopener noreferrer">查看官方页 ↗</a>
+          </article>
+
+          <article class="resource-card" data-tags="tool cad ai">
+            <div class="meta"><span class="tag purple">AI 工具</span><span class="tag">程序化</span></div>
+            <h3>Zoo · Zookeeper</h3>
+            <p>观察对话式 CAD 智能体如何在几何引擎中规划、调试和生成可编辑设计。</p>
+            <a class="resource-link" href="https://zoo.dev/text-to-cad" target="_blank" rel="noopener noreferrer">查看官方页 ↗</a>
+          </article>
+
+          <article class="resource-card" data-tags="free pdf python official">
+            <div class="meta"><span class="tag">提取</span><span class="tag blue">Python</span></div>
+            <h3>pdfplumber</h3>
+            <p>用于提取 PDF 文字及坐标，适合 A 类可搜索文本工程图；比先截图 OCR 更可控。</p>
+            <a class="resource-link" href="https://pypi.org/project/pdfplumber/" target="_blank" rel="noopener noreferrer">打开文档 ↗</a>
+          </article>
+
+          <article class="resource-card" data-tags="free blender creative">
+            <div class="meta"><span class="tag purple">分支</span><span class="tag">概念</span></div>
+            <h3>Blender 官方教程</h3>
+            <p>只学场景组织、基本建模与材质即可；不要把 Blender 能力误当精密 CAD 能力。</p>
+            <a class="resource-link" href="https://www.blender.org/support/tutorials/" target="_blank" rel="noopener noreferrer">打开教程 ↗</a>
+          </article>
+
+          <article class="resource-card" data-tags="official free solidworks learning">
+            <div class="meta"><span class="tag">社区</span><span class="tag blue">官方</span></div>
+            <h3>MySolidWorks</h3>
+            <p>官方教程、社区和学习资源的集中入口，用来继续补 SolidWorks 自身工作流。</p>
+            <a class="resource-link" href="https://my.solidworks.com/?lang=cn" target="_blank" rel="noopener noreferrer">打开 MySolidWorks ↗</a>
+          </article>
+        </div>
+        <div class="resource-empty" id="resource-empty" hidden>没有匹配的资源。试试“API”“图纸”“GD&T”或“官方”。</div>
+      </div>
+    </section>
+
+    <section class="section" id="glossary">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <div class="section-index">07 / GLOSSARY</div>
+            <h2>以后看教程时，先把词对上</h2>
+          </div>
+          <p>这些词会把工程图、AI 和 CAD 自动化三个圈子连起来。</p>
+        </div>
+
+        <div class="glossary">
+          <details open>
+            <summary>参数化建模</summary>
+            <p>模型由尺寸、约束和特征关系决定，而不是只保存一串固定几何。改关键参数后，下游特征能按设计意图更新。</p>
+          </details>
+          <details>
+            <summary>特征树 / Feature Tree</summary>
+            <p>SolidWorks 中按顺序记录主体、切除、孔、阵列、圆角等操作的构造历史。可编辑特征树比 STEP 网格更接近可维护模型。</p>
+          </details>
+          <details>
+            <summary>尺寸台账</summary>
+            <p>把图纸上的尺寸结构化：数值、单位、公差、来源视图、约束对象和确认状态。它是 AI 与 CAD 之间最重要的中间产物。</p>
+          </details>
+          <details>
+            <summary>VLM / 多模态模型</summary>
+            <p>能同时读取图像和文字的模型。适合解释视图关系和生成待确认问题，但视觉相似不等于尺寸正确。</p>
+          </details>
+          <details>
+            <summary>API / COM</summary>
+            <p>程序调用 SolidWorks 功能的接口。宏录制给你现实可用的调用样例，Python 可以通过 Windows COM 接口驱动本机软件。</p>
+          </details>
+          <details>
+            <summary>Drawing to CAD</summary>
+            <p>从二维工程图重建三维模型的产品类别。重点不是“打开 PDF”，而是提取尺寸、补齐关系、生成特征并校验。</p>
+          </details>
+          <details>
+            <summary>Scan / Mesh to CAD</summary>
+            <p>从扫描网格或点云识别几何并重建成可编辑特征。属于逆向工程分支，输入与 2D 图纸完全不同。</p>
+          </details>
+          <details>
+            <summary>确定性校验</summary>
+            <p>用数值而不是感觉判断结果，例如包络尺寸、孔中心坐标、孔径、体积、质量和重建状态。它是自动化最关键的刹车。</p>
+          </details>
+          <details>
+            <summary>净节省时间</summary>
+            <p>人工基线减去 AI 执行、审图、修正和校验所花时间。只有长期为正，自动建模才真正提升效率。</p>
+          </details>
+        </div>
+
+        <div class="final-callout">
+          <div>
+            <h3>从现在开始，别追求“全自动”。</h3>
+            <p>先完成一张图的“尺寸台账 → 特征计划 → 手工模型 → 数值对齐”。一旦这条闭环稳定，再让 AI 接手其中一段。</p>
+          </div>
+          <a class="button button-primary" href="#top">回到顶部</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell footer-grid">
+      <p>本页为学习与部署路线图，不包含软件破解、许可证绕过或制造验收承诺。AI 工具的功能、价格和可用性以官方页面为准。工程模型须由有资格的人员按实际图纸、标准和制造需求复核。</p>
+      <p>最后核对：2026-10-24 · 中文单页 · 可离线打开</p>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      const root = document.documentElement;
+      const taskChecks = Array.from(document.querySelectorAll(".task-check"));
+      const gateChecks = Array.from(document.querySelectorAll(".gate-check"));
+      const progressNumber = document.getElementById("progress-number");
+      const progressBar = document.getElementById("progress-bar");
+      const progressTrack = document.getElementById("progress-track");
+      const progressLabel = document.getElementById("progress-label");
+      const progressRing = document.getElementById("progress-ring");
+      const gateProgress = document.getElementById("gate-progress");
+      const STORAGE_KEY = "ai-cad-map-tasks-v1";
+      const THEME_KEY = "ai-cad-map-theme-v1";
+
+      try {
+        const savedTheme = localStorage.getItem(THEME_KEY);
+        if (savedTheme === "light" || savedTheme === "dark") {
+          root.dataset.theme = savedTheme;
+        }
+      } catch {}
+
+      document.getElementById("theme-toggle").addEventListener("click", () => {
+        root.dataset.theme = root.dataset.theme === "light" ? "dark" : "light";
+        try {
+          localStorage.setItem(THEME_KEY, root.dataset.theme);
+        } catch {}
+      });
+
+      function loadState() {
+        try {
+          return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+        } catch {
+          return {};
+        }
+      }
+
+      function saveState(state) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch {}
+      }
+
+      function updateProgress() {
+        const total = taskChecks.length;
+        const complete = taskChecks.filter((item) => item.checked).length;
+        const percent = total ? Math.round((complete / total) * 100) : 0;
+        progressNumber.textContent = `${percent}%`;
+        progressBar.style.width = `${percent}%`;
+        progressTrack.setAttribute("aria-valuenow", String(percent));
+        progressLabel.textContent = `已完成 ${complete} / ${total} 项`;
+        progressRing.style.setProperty("--progress", String(percent));
+        taskChecks.forEach((item) => {
+          const card = item.closest("[data-task-card]");
+          if (card) card.classList.toggle("done", item.checked);
+        });
+      }
+
+      const savedState = loadState();
+      taskChecks.forEach((item) => {
+        item.checked = Boolean(savedState[item.dataset.task]);
+        item.addEventListener("change", () => {
+          const state = loadState();
+          if (item.checked) state[item.dataset.task] = true;
+          else delete state[item.dataset.task];
+          saveState(state);
+          updateProgress();
+        });
+      });
+      updateProgress();
+
+      document.getElementById("reset-progress").addEventListener("click", () => {
+        taskChecks.forEach((item) => {
+          item.checked = false;
+        });
+        saveState({});
+        updateProgress();
+      });
+
+      gateChecks.forEach((item) => {
+        item.addEventListener("change", () => {
+          const complete = gateChecks.filter((check) => check.checked).length;
+          gateProgress.style.width = `${(complete / gateChecks.length) * 100}%`;
+        });
+      });
+
+      const mapTabs = Array.from(document.querySelectorAll(".map-tab"));
+      mapTabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          mapTabs.forEach((item) => {
+            const selected = item === tab;
+            item.setAttribute("aria-selected", String(selected));
+            const panel = document.getElementById(item.getAttribute("aria-controls"));
+            if (panel) panel.hidden = !selected;
+          });
+        });
+      });
+
+      const pipelineData = [
+        {
+          kicker: "STEP 01 / INPUT GATE",
+          title: "接收与版本锁定",
+          text: "先确认图纸的修订版、单位、投影法、页码与标题栏。导入不可识别或版本不一致的图，后续全部工作在错误对象上。",
+          list: [
+            "优先索取 DWG/DXF 或可搜索文本的 PDF。",
+            "记录图号、版本、日期、比例、单位与材料。",
+            "所有后续输出必须绑定原始文件哈希与页码。"
+          ]
+        },
+        {
+          kicker: "STEP 02 / EXTRACT",
+          title: "原生文本与几何提取",
+          text: "A 类 PDF 可直接提取字符、坐标和页码。图形渲染只负责核对，不应成为尺寸数值的唯一来源。",
+          list: [
+            "从每个文本 span 中保留字符、坐标、字号和页码。",
+            "提取矢量线框、视图边界、标题栏与修订栏。",
+            "将同一张图的文字与图像按坐标关联，形成可追溯输入。"
+          ]
+        },
+        {
+          kicker: "STEP 03 / LEDGER",
+          title: "尺寸台账与疑问队列",
+          text: "让 AI 把尺寸归类到几何对象，但不允许它用视觉比例补数。所有冲突、缺失和单位不确定项都进入人工队列。",
+          list: [
+            "每个尺寸记录：值、上下偏差、单位、视图、约束对象、来源坐标。",
+            "标记明确、歧义、缺失、冲突四种状态。",
+            "未解决项超过阈值时，不进入自动建模。"
+          ]
+        },
+        {
+          kicker: "STEP 04 / PLAN",
+          title: "特征计划与参数命名",
+          text: "把零件类别映射到稳定构造策略。算法输出顺序、基准、草图和依赖，不先输出一条不可解释的实体。",
+          list: [
+            "板类：基准板 → 外形 → 主孔/槽 → 阵列 → 台阶 → 边角。",
+            "回转体：旋转轮廓 → 端部 → 孔系 → 槽 → 倒角。",
+            "关键尺寸用名称绑定，便于修改与自动校验。"
+          ]
+        },
+        {
+          kicker: "STEP 05 / BUILD",
+          title: "通过模板与 API 执行",
+          text: "能用确定性脚本执行的操作，不要交给随机生成。AI 工具适合解释和规划；宏与 API 适合重复、可验证的执行。",
+          list: [
+            "每次从空白模板或副本开始，禁止直接覆盖源文件。",
+            "保存参数表、源图哈希、模型版本和构建日志。",
+            "大改动先请求计划；执行后立即重建并检查错误。"
+          ]
+        },
+        {
+          kicker: "STEP 06 / VERIFY",
+          title: "几何与设计意图校验",
+          text: "从视觉相似升级到数值一致。比较包络、孔系统、体积/质量、特征树和参数变更后的依赖行为。",
+          list: [
+            "包络尺寸与图纸公差逐项比较。",
+            "孔数、孔径、深度、中心坐标全部核对。",
+            "修改关键参数后执行重建，验证依赖特征。"
+          ]
+        },
+        {
+          kicker: "STEP 07 / RELEASE",
+          title: "人工签核与持续回写",
+          text: "模型通过后仍由人确认公差、材料和制造要求。把失败样本、假设与修复动作回写到训练集，形成下一次改进依据。",
+          list: [
+            "输出 PASS / REVIEW / FAIL 状态与阻断项。",
+            "记录净节省时间、错误类型和人工修复分钟数。",
+            "下一轮只改一个瓶颈，避免无法判断优化效果。"
+          ]
+        }
+      ];
+
+      const pipeDetail = document.getElementById("pipe-detail");
+      const pipeKicker = document.getElementById("pipe-kicker");
+      const pipeTitle = document.getElementById("pipe-title");
+      const pipeText = document.getElementById("pipe-text");
+      const pipeList = document.getElementById("pipe-list");
+
+      function showPipeline(index) {
+        const data = pipelineData[index];
+        if (!data) return;
+        document.querySelectorAll(".pipe-step").forEach((button) => {
+          button.setAttribute("aria-pressed", String(Number(button.dataset.pipe) === index));
+        });
+        pipeKicker.textContent = data.kicker;
+        pipeTitle.textContent = data.title;
+        pipeText.textContent = data.text;
+        pipeList.replaceChildren();
+        data.list.forEach((text) => {
+          const li = document.createElement("li");
+          li.textContent = text;
+          pipeList.appendChild(li);
+        });
+        pipeDetail.animate(
+          [
+            { opacity: 0.7, transform: "translateY(4px)" },
+            { opacity: 1, transform: "translateY(0)" }
+          ],
+          { duration: 180, easing: "ease-out" }
+        );
+      }
+
+      document.querySelectorAll(".pipe-step").forEach((button) => {
+        button.addEventListener("click", () => showPipeline(Number(button.dataset.pipe)));
+      });
+
+      document.querySelectorAll("[data-jump-pipeline]").forEach((link) => {
+        link.addEventListener("click", () => showPipeline(Number(link.dataset.jumpPipeline)));
+      });
+
+      async function copyText(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+          return;
+        }
+        const area = document.createElement("textarea");
+        area.value = text;
+        area.style.position = "fixed";
+        area.style.opacity = "0";
+        document.body.appendChild(area);
+        area.select();
+        document.execCommand("copy");
+        area.remove();
+      }
+
+      document.querySelectorAll(".copy-button").forEach((button) => {
+        button.addEventListener("click", async () => {
+          const target = document.querySelector(button.dataset.copy);
+          const state = button.closest(".prompt-card").querySelector(".copy-state");
+          if (!target) return;
+          try {
+            await copyText(target.textContent.trim());
+            state.textContent = "已复制，可直接粘贴到 AI 工具。";
+          } catch {
+            state.textContent = "复制失败，请手动选择文本。";
+          }
+        });
+      });
+
+      const resourceCards = Array.from(document.querySelectorAll(".resource-card"));
+      const filterButtons = Array.from(document.querySelectorAll(".filter-button"));
+      const searchInput = document.getElementById("resource-search");
+      const emptyState = document.getElementById("resource-empty");
+      const resourceStatus = document.getElementById("resource-status");
+      let activeFilter = "all";
+
+      function applyResourceFilter() {
+        const query = searchInput.value.trim().toLowerCase();
+        let visibleCount = 0;
+        resourceCards.forEach((card) => {
+          const matchesFilter = activeFilter === "all" || card.dataset.tags.includes(activeFilter);
+          const matchesQuery = !query || card.textContent.toLowerCase().includes(query) || card.dataset.tags.includes(query);
+          const visible = matchesFilter && matchesQuery;
+          card.hidden = !visible;
+          if (visible) visibleCount += 1;
+        });
+        emptyState.hidden = visibleCount !== 0;
+        resourceStatus.textContent = `当前显示 ${visibleCount} 个资源。`;
+      }
+
+      filterButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          activeFilter = button.dataset.filter;
+          filterButtons.forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+          applyResourceFilter();
+        });
+      });
+      searchInput.addEventListener("input", applyResourceFilter);
+
+      const navLinks = Array.from(document.querySelectorAll(".main-nav a"));
+      const sections = navLinks
+        .map((link) => document.querySelector(link.getAttribute("href")))
+        .filter(Boolean);
+      if ("IntersectionObserver" in window) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return;
+              navLinks.forEach((link) => {
+                link.classList.toggle("active", link.getAttribute("href") === `#${entry.target.id}`);
+              });
+            });
+          },
+          { rootMargin: "-25% 0px -60% 0px", threshold: 0 }
+        );
+        sections.forEach((section) => observer.observe(section));
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1665 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 建模学习地图 · 从一句话到可编辑特征树（SolidWorks 2025）</title>
+<meta name="description" content="面向 SolidWorks 2025 的 AI 建模学习与部署地图：一个周末跑通「一句话 → 宏 → 可编辑特征树」的闭环，含三个可复制 VBA 宏、报错急救表、优化清单与 SKY-001 观察哨。">
+<style>
+:root{
+  --ink:#0a1b2e; --ink2:#3b5874; --muted:#6d859c;
+  --acc:#0b6bcb; --acc2:#1f9bff; --cyan:#2fbccb;
+  --line:#dbe9f6; --soft:#f4faff; --card:#ffffff;
+  --warn:#b26a00; --warnbg:#fff7e8;
+  --bad:#b42318; --badbg:#fff1f0;
+  --ok:#087443; --okbg:#eefaf3;
+  --mono:ui-monospace,SFMono-Regular,Consolas,"Cascadia Mono",Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{
+  margin:0;color:var(--ink);background:#fff;line-height:1.78;
+  font-family:"Segoe UI","PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+  font-size:16px;-webkit-font-smoothing:antialiased;
+}
+a{color:var(--acc);text-decoration:none;border-bottom:1px solid rgba(11,107,203,.25)}
+a:hover{border-bottom-color:var(--acc)}
+h1,h2,h3,h4{line-height:1.3;letter-spacing:-.015em}
+p{margin:.6em 0}
+strong{color:#07182a}
+code{font-family:var(--mono);font-size:.9em;background:#eef6fd;padding:1px 6px;border-radius:5px;color:#0b4d8a}
+
+/* ---------- 顶部进度 ---------- */
+#progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:99;
+  background:linear-gradient(90deg,var(--acc),var(--cyan));transition:width .1s linear}
+
+/* ---------- Hero ---------- */
+.hero{position:relative;overflow:hidden;padding:88px 24px 64px;
+  background:
+    radial-gradient(900px 420px at 82% -12%, #c9e7ff 0%, rgba(201,231,255,0) 62%),
+    radial-gradient(700px 360px at 6% 4%, #e6f6ff 0%, rgba(230,246,255,0) 60%),
+    linear-gradient(180deg,#f6fbff 0%,#eaf6ff 52%,#ffffff 100%);
+  border-bottom:1px solid var(--line);}
+.hero::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background-image:linear-gradient(rgba(11,107,203,.05) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(11,107,203,.05) 1px,transparent 1px);
+  background-size:48px 48px;
+  mask-image:radial-gradient(600px 300px at 70% 20%,#000 0%,transparent 75%);}
+.hero-in{position:relative;max-width:1120px;margin:0 auto}
+.kicker{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);
+  font-size:12px;letter-spacing:.18em;color:var(--acc);text-transform:uppercase;
+  background:rgba(255,255,255,.75);border:1px solid #cfe6fa;padding:6px 12px;border-radius:999px}
+.kicker i{width:6px;height:6px;border-radius:50%;background:var(--cyan);display:inline-block}
+h1{font-size:clamp(32px,5.2vw,54px);margin:22px 0 14px;font-weight:800}
+h1 em{font-style:normal;background:linear-gradient(100deg,var(--acc) 0%,var(--cyan) 90%);
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.sub{font-size:clamp(16px,2vw,19px);color:var(--ink2);max-width:720px;margin:0}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:34px}
+.stat{background:rgba(255,255,255,.82);border:1px solid #d7e9f9;border-radius:14px;
+  padding:14px 18px;backdrop-filter:blur(6px)}
+.stat b{display:block;font-size:22px;letter-spacing:-.02em;color:var(--acc)}
+.stat span{font-size:12.5px;color:var(--muted)}
+.hero-meta{margin-top:26px;font-size:12.5px;color:var(--muted);font-family:var(--mono);
+  display:flex;gap:18px;flex-wrap:wrap}
+
+/* ---------- 导航 ---------- */
+.nav{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.88);
+  backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.nav-in{max-width:1120px;margin:0 auto;padding:9px 18px;display:flex;gap:2px;overflow-x:auto;
+  scrollbar-width:none}
+.nav-in::-webkit-scrollbar{display:none}
+.nav a{border:0;color:var(--ink2);font-size:13.5px;padding:7px 11px;border-radius:999px;white-space:nowrap}
+.nav a:hover{background:#eef7ff;color:var(--acc)}
+.nav a.active{background:#e3f2ff;color:var(--acc);font-weight:600}
+
+/* ---------- 布局 ---------- */
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+section.block{padding:70px 0;border-bottom:1px solid #eff6fc}
+section.block:last-of-type{border-bottom:0}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:4px}
+.sec-no{font-family:var(--mono);font-size:12.5px;letter-spacing:.16em;color:var(--acc2)}
+h2{font-size:clamp(23px,2.8vw,30px);margin:0}
+.lede{color:var(--ink2);max-width:820px;margin:8px 0 34px;font-size:16.5px}
+h3{font-size:19px;margin:34px 0 12px}
+h4{font-size:15.5px;margin:0 0 8px}
+
+/* ---------- 卡片 ---------- */
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px;
+  box-shadow:0 1px 2px rgba(10,27,46,.04),0 8px 24px -18px rgba(10,27,46,.25)}
+.card.tint{background:linear-gradient(180deg,#fbfdff,#f5faff)}
+.card h4{display:flex;align-items:center;gap:8px}
+.tag{display:inline-block;font-size:11.5px;font-family:var(--mono);letter-spacing:.06em;
+  padding:2px 8px;border-radius:6px;background:#e8f3ff;color:var(--acc);border:1px solid #d3e8fb}
+.tag.ok{background:var(--okbg);color:var(--ok);border-color:#c7ecd9}
+.tag.no{background:var(--badbg);color:var(--bad);border-color:#f6d5d2}
+.tag.wait{background:var(--warnbg);color:var(--warn);border-color:#f3dfb8}
+ul.tight{margin:8px 0 0;padding-left:18px}
+ul.tight li{margin:6px 0;color:var(--ink2)}
+ul.tight li strong{color:var(--ink)}
+.small{font-size:13.5px;color:var(--muted)}
+
+/* ---------- 提示框 ---------- */
+.note,.warn,.bad,.good{border-radius:14px;padding:16px 18px;margin:18px 0;font-size:15px;
+  border:1px solid;position:relative;padding-left:18px}
+.note{background:#f3f9ff;border-color:#d3e8fb;border-left:4px solid var(--acc2)}
+.warn{background:var(--warnbg);border-color:#f2dfb9;border-left:4px solid #d99a00}
+.bad{background:var(--badbg);border-color:#f6d5d2;border-left:4px solid #e0492f}
+.good{background:var(--okbg);border-color:#c7ecd9;border-left:4px solid #0f9d63}
+.note b,.warn b,.bad b,.good b{display:block;margin-bottom:4px}
+
+/* ---------- 路线地图 ---------- */
+.lanes{display:grid;gap:14px;margin-top:8px}
+.lane{display:grid;grid-template-columns:150px 1fr 170px;gap:18px;align-items:center;
+  background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+.lane .ln{font-family:var(--mono);font-size:12px;color:var(--acc2);letter-spacing:.1em}
+.lane .ln b{display:block;font-family:"Segoe UI","Microsoft YaHei",sans-serif;font-size:15.5px;
+  color:var(--ink);letter-spacing:0;margin-top:2px}
+.lane .flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13.5px;color:var(--ink2)}
+.chip{background:#f2f9ff;border:1px solid #d9ecfd;border-radius:8px;padding:3px 9px;font-size:12.5px;color:#245a8c}
+.arrow{color:#9dc4e6}
+.lane.hl{border-color:#b9dcfb;background:linear-gradient(90deg,#f6fbff,#fff 60%);
+  box-shadow:0 0 0 3px rgba(31,155,255,.06)}
+
+/* ---------- 时间线 ---------- */
+.day{margin-top:8px}
+.day-h{display:flex;align-items:center;gap:12px;margin:30px 0 6px}
+.day-h .d{font-family:var(--mono);font-size:12px;letter-spacing:.16em;color:#fff;background:var(--acc);
+  padding:3px 10px;border-radius:6px}
+.day-h .t{font-size:16px;font-weight:600}
+.slot{display:grid;grid-template-columns:110px 1fr;gap:20px;padding:18px 0;border-top:1px dashed var(--line)}
+.slot .time{font-family:var(--mono);font-size:12.5px;color:var(--muted);padding-top:3px}
+.slot .body h4{margin:0 0 6px;font-size:16px}
+.slot .body p{margin:4px 0;font-size:14.5px;color:var(--ink2)}
+.deliver{font-size:13px;color:var(--ok);background:var(--okbg);border:1px solid #cdebdc;
+  border-radius:8px;padding:6px 10px;display:inline-block;margin-top:8px}
+
+/* ---------- 步骤 ---------- */
+.steps{counter-reset:s;display:grid;gap:12px;margin-top:10px}
+.step{position:relative;padding:16px 18px 16px 58px;background:#fff;border:1px solid var(--line);border-radius:14px}
+.step::before{counter-increment:s;content:counter(s);position:absolute;left:16px;top:15px;
+  width:26px;height:26px;border-radius:50%;background:#e8f3ff;color:var(--acc);
+  font-family:var(--mono);font-size:13px;display:grid;place-items:center;font-weight:700}
+.step b{display:block;font-size:15.5px;margin-bottom:2px}
+.step p{margin:2px 0;font-size:14.5px;color:var(--ink2)}
+
+/* ---------- 流水线 ---------- */
+.pipe{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:18px 0 6px}
+.pnode{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;position:relative}
+.pnode b{display:block;font-size:14px;margin-bottom:4px}
+.pnode span{font-size:12.5px;color:var(--muted);line-height:1.55;display:block}
+.pnode em{font-family:var(--mono);font-style:normal;font-size:11px;color:var(--acc2);letter-spacing:.1em}
+.pnode::after{content:"→";position:absolute;right:-11px;top:calc(50% - 12px);color:#a9cbe8;font-size:16px}
+.pnode:last-child::after{display:none}
+
+/* ---------- 代码 ---------- */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:26px 0 14px}
+.tab{border:1px solid var(--line);background:#fff;color:var(--ink2);border-radius:999px;
+  padding:8px 16px;font-size:14px;cursor:pointer;font-family:inherit}
+.tab:hover{border-color:#b9dcfb;color:var(--acc)}
+.tab.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.panel{display:none}
+.panel.active{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.code-card{background:#0b1b2e;border-radius:16px;overflow:hidden;border:1px solid #16324f;
+  box-shadow:0 18px 40px -28px rgba(6,20,36,.8)}
+.code-head{display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:10px 14px;background:#0f2540;color:#b9d5ef;font-size:12.5px;font-family:var(--mono);
+  border-bottom:1px solid #1b3a5a}
+.code-head .lbl{display:flex;align-items:center;gap:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dot{width:8px;height:8px;border-radius:50%;background:#38d39f;flex:none}
+.copy{border:1px solid #2b5075;background:#132c4a;color:#cfe4f7;border-radius:7px;
+  padding:5px 12px;font-size:12.5px;cursor:pointer;font-family:inherit;flex:none}
+.copy:hover{background:#1a3b60;color:#fff}
+.copy.ok{background:#12543b;border-color:#1d7a56;color:#8ff0c4}
+pre{margin:0;padding:18px 18px 22px;overflow:auto;max-height:560px;
+  font-family:var(--mono);font-size:12.6px;line-height:1.72;color:#cfe3f6;tab-size:4}
+pre code{background:none;padding:0;color:inherit;font-size:inherit}
+pre::-webkit-scrollbar{height:9px;width:9px}
+pre::-webkit-scrollbar-thumb{background:#26496e;border-radius:9px}
+
+/* ---------- 表格 ---------- */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:#fff}
+table{width:100%;border-collapse:collapse;font-size:14.2px;min-width:620px}
+th{text-align:left;background:#f5faff;color:var(--ink2);font-weight:600;padding:11px 14px;
+  border-bottom:1px solid var(--line);white-space:nowrap;font-size:13.5px}
+td{padding:11px 14px;border-bottom:1px solid #f1f7fc;vertical-align:top;color:var(--ink2)}
+tr:last-child td{border-bottom:0}
+td b{color:var(--ink)}
+td code{white-space:nowrap}
+
+/* ---------- 清单 ---------- */
+.checks{display:grid;gap:10px;margin-top:14px}
+.check{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--line);
+  border-radius:12px;padding:13px 16px;cursor:pointer;transition:.15s}
+.check:hover{border-color:#bcdcf8;background:#fbfdff}
+.check input{appearance:none;width:19px;height:19px;border:1.6px solid #b9d3e9;border-radius:5px;
+  flex:none;margin-top:3px;cursor:pointer;position:relative;background:#fff}
+.check input:checked{background:var(--acc);border-color:var(--acc)}
+.check input:checked::after{content:"";position:absolute;left:6px;top:2px;width:4px;height:9px;
+  border:solid #fff;border-width:0 2px 2px 0;transform:rotate(42deg)}
+.check span{font-size:14.6px;color:var(--ink)}
+.check input:checked + span{color:var(--muted);text-decoration:line-through}
+.score{display:flex;align-items:center;gap:18px;margin-top:22px;flex-wrap:wrap;
+  background:linear-gradient(90deg,#f4faff,#fff);border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+.score .num{font-family:var(--mono);font-size:26px;font-weight:700;color:var(--acc);min-width:96px}
+.bar{flex:1;min-width:180px;height:8px;background:#e6f1fa;border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--acc),var(--cyan));
+  border-radius:99px;transition:width .3s ease}
+#scoreMsg{font-size:14px;color:var(--ink2);flex-basis:100%}
+
+/* ---------- 链接 ---------- */
+.links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:10px}
+.lk{display:flex;gap:12px;justify-content:space-between;align-items:flex-start;
+  background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;border-bottom-width:1px}
+.lk:hover{border-color:#a9d2f6;background:#fbfdff;text-decoration:none}
+.lk .t{font-size:14.6px;color:var(--ink);font-weight:600}
+.lk .d{font-size:12.8px;color:var(--muted);margin-top:2px}
+.lk .go{font-family:var(--mono);font-size:11px;color:var(--acc2);border:1px solid #d5eafb;
+  border-radius:6px;padding:2px 6px;white-space:nowrap;flex:none}
+.link-head{display:flex;align-items:center;gap:10px;margin:26px 0 4px;font-size:13px;
+  font-family:var(--mono);letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+.link-head::after{content:"";flex:1;height:1px;background:var(--line)}
+
+/* ---------- SKY ---------- */
+.sky{background:linear-gradient(180deg,#071c33 0%,#0b2745 60%,#0d2f52 100%);
+  color:#dcecfa;border-radius:22px;padding:34px 30px;position:relative;overflow:hidden}
+.sky::before{content:"";position:absolute;inset:0;
+  background:radial-gradient(600px 200px at 80% 0%,rgba(56,180,255,.25),transparent 70%),
+             radial-gradient(400px 200px at 10% 100%,rgba(47,188,203,.18),transparent 70%);
+  pointer-events:none}
+.sky > *{position:relative}
+.sky h3{margin:0 0 6px;font-size:22px;color:#fff}
+.sky p{color:#b9d3ea}
+.sky .kv{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px 0}
+.sky .kv div{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+  border-radius:12px;padding:12px 14px}
+.sky .kv b{display:block;font-size:19px;color:#7fd4ff;font-family:var(--mono)}
+.sky .kv span{font-size:12px;color:#9dbad4}
+.sky a{color:#7fd4ff;border-bottom-color:rgba(127,212,255,.35)}
+.sky strong{color:#f4fbff}
+.sky ul{padding-left:18px;color:#c6dcee}
+.sky li{margin:6px 0}
+.sky .stages{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px}
+.sky .stages div{border-top:2px solid rgba(127,212,255,.5);padding-top:10px;font-size:13px;color:#b9d3ea}
+.sky .stages b{display:block;color:#eaf6ff;font-size:13.5px;margin-bottom:2px}
+
+/* ---------- 页脚 ---------- */
+footer{padding:44px 0 70px;color:var(--muted);font-size:13px}
+footer .wrap{border-top:1px solid var(--line);padding-top:24px}
+footer a{color:var(--ink2)}
+
+/* ---------- 其他 ---------- */
+.reveal{opacity:0;transform:translateY(10px);transition:opacity .5s ease,transform .5s ease}
+.reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .reveal{opacity:1;transform:none;transition:none}
+}
+.top{position:fixed;right:20px;bottom:22px;width:42px;height:42px;border-radius:50%;
+  background:#fff;border:1px solid var(--line);box-shadow:0 8px 24px -12px rgba(10,27,46,.4);
+  display:grid;place-items:center;cursor:pointer;color:var(--acc);font-size:16px;z-index:70;
+  opacity:0;pointer-events:none;transition:.2s}
+.top.show{opacity:1;pointer-events:auto}
+kbd{font-family:var(--mono);font-size:12px;background:#f2f8fd;border:1px solid #d7e8f6;
+  border-bottom-width:2px;border-radius:5px;padding:1px 6px;color:var(--ink2);white-space:nowrap}
+
+@media (max-width:860px){
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:960px){
+  .g4{grid-template-columns:repeat(2,1fr)}
+  .g3{grid-template-columns:1fr}
+  .pipe{grid-template-columns:1fr}
+  .pnode::after{content:"↓";right:auto;left:calc(50% - 6px);top:auto;bottom:-15px}
+  .sky .kv{grid-template-columns:repeat(2,1fr)}
+  .sky .stages{grid-template-columns:repeat(2,1fr)}
+  .lane{grid-template-columns:1fr;gap:8px}
+}
+@media (max-width:680px){
+  .g2,.g4,.links{grid-template-columns:1fr}
+  .slot{grid-template-columns:1fr;gap:4px}
+  .hero{padding:64px 20px 48px}
+  section.block{padding:52px 0}
+  .sky{padding:26px 20px}
+  .tab{padding:7px 12px;font-size:13px}
+}
+@media print{
+  .nav,#progress,.top,.copy,.tabs{display:none!important}
+  body{font-size:11.5pt}
+  section.block{page-break-inside:avoid;padding:22pt 0}
+  .code-card{box-shadow:none}
+  pre{max-height:none;font-size:9pt}
+  a{border:0;color:#000}
+  .reveal{opacity:1;transform:none}
+  .panel{display:block!important}
+}
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="hero-in">
+    <span class="kicker"><i></i>SKY / AI 建模学习地图 · v1.0</span>
+    <h1>从一句话，<br>到一棵<em>可编辑的特征树</em></h1>
+    <p class="sub">给会用 SolidWorks、但不写代码的人。一个周末跑通「描述零件 → AI 写宏 → 点运行 → 设计树长出来 → 改尺寸」的完整回路，并知道 2026 年这波 AI 建模到底走到哪一步。</p>
+    <div class="stats">
+      <div class="stat"><b>2 天</b><span>跑通闭环，不是学完</span></div>
+      <div class="stat"><b>3 类零件</b><span>法兰 / 阶梯轴 / 齿轮坯</span></div>
+      <div class="stat"><b>0 元</b><span>不买插件，全程本地</span></div>
+      <div class="stat"><b>SW 2025</b><span>VBA 宏 + API</span></div>
+    </div>
+    <div class="hero-meta">
+      <span>更新 2026-10-24</span><span>适用 SolidWorks 2025</span><span>阅读约 25 分钟</span><span>建议先读 01 → 03 → 04</span>
+    </div>
+  </div>
+</header>
+
+<!-- ================= NAV ================= -->
+<nav class="nav">
+  <div class="nav-in">
+    <a href="#verdict">01 先看结论</a>
+    <a href="#map">02 认知地图</a>
+    <a href="#weekend">03 周末冲刺</a>
+    <a href="#setup">04 环境与录制宏</a>
+    <a href="#loop">05 核心回路</a>
+    <a href="#macros">06 三个宏</a>
+    <a href="#errors">07 报错急救</a>
+    <a href="#optimize">08 优化四表</a>
+    <a href="#sky">09 SKY-001</a>
+    <a href="#links">10 链接库</a>
+    <a href="#check">11 通关自测</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- ================= 01 结论 ================= -->
+<section class="block" id="verdict">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-no">01</span><h2>先把话说明白：能做到什么，做不到什么</h2></div>
+    <p class="lede">你想要的“一句话生成 SolidWorks 模型、设计树还能编辑”，在 2026 年 10 月这个时间点，<strong>没有现成产品能直接给你</strong>。但有一条路能自己搭出来，而且不需要你会写代码——只需要你会复制、粘贴、点运行。</p>
+
+    <div class="grid g4">
+      <div class="card tint">
+        <h4><span class="tag ok">能做到</span></h4>
+        <ul class="tight">
+          <li>一句话描述 → 宏 → <strong>带完整特征树</strong>的零件</li>
+          <li>改几个数字重跑，30 秒出新规格</li>
+          <li>法兰、阶梯轴、齿轮坯这类“有固定套路”的件</li>
+          <li>全程离线，不联网、不买插件</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4><span class="tag no">做不到</span></h4>
+        <ul class="tight">
+          <li>任意零件一句话完美生成</li>
+          <li>曲面、复杂装配、外观件（放样/抽壳）</li>
+          <li>让 AI 直接吐一个 <code>.sldprt</code> 文件给你</li>
+          <li>一次成功、永不返工</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4><span class="tag">要花多久</span></h4>
+        <ul class="tight">
+          <li><strong>2 天</strong>：跑通 3 类件，知道哪里会坏</li>
+          <li><strong>2–4 周</strong>：新零件也能自己调出来</li>
+          <li><strong>持续</strong>：把宏攒成你自己的标准件库</li>
+          <li>前提：每天真的动手，不是只看</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4><span class="tag wait">代价</span></h4>
+        <ul class="tight">
+          <li>你要看得懂 5 行代码在干什么</li>
+          <li>你要会看报错、会改一个数字</li>
+          <li>AI 写的宏一次成功率约 6–8 成</li>
+          <li>复杂件的失败率会明显更高</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="warn">
+      <b>三个必须接受的现实</b>
+      第一，<strong>AI 目前不会“画”SolidWorks，它只会“写命令”</strong>——所以你要的是让 AI 写对命令，而不是让它理解你的零件。<br>
+      第二，<strong>任何把 STEP/STL 导进 SolidWorks 的方案，都会毁掉特征树</strong>（只会留下一个 <code>Imported1</code>）。这是路线选择的分水岭。<br>
+      第三，<strong>“通用宏”是个陷阱</strong>。越通用越脆，先做“一种零件一个专用宏”，再谈复用。
+    </div>
+
+    <h3>四条常见误解，先拆掉</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:32%">你可能以为</th><th>实际情况</th></tr></thead>
+        <tbody>
+          <tr><td><b>AI 能直接给我 .sldprt</b></td><td>不能。SolidWorks 文件格式封闭且带历史依赖，云端服务没有理由、也没有接口去写它。所有“文生 CAD”都给你 STEP / STL / 网格。</td></tr>
+          <tr><td><b>STEP 导进来再改改就是参数化</b></td><td>不是。STEP 只记录几何面（B-rep），不记录“先拉伸再切除”的历史。导入后是“死实体”，改一个孔要重新做布尔。</td></tr>
+          <tr><td><b>宏写得越通用越好</b></td><td>反了。通用宏要处理无数边界情况，AI 写十个通用宏不如写一个专用宏稳。先“一个零件一个宏”，稳定后再抽参数。</td></tr>
+          <tr><td><b>装个 AI 插件就能自动建模</b></td><td>市面插件多数做渲染、选型、网格减面、图纸识别，不生成特征树。真做特征树这条路，目前只有“宏/API”这一条。</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 02 地图 ================= -->
+<section class="block" id="map">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-no">02</span><h2>认知地图：AI 建模其实有四条路</h2></div>
+    <p class="lede">“AI 建模”是一个被说烂的词。它至少包含四种完全不同的技术，产出物、能改不能改、要不要联网，全都不一样。你只需要认清一件事：<strong>你要的是“建模历史”，不是“几何形状”。</strong></p>
+
+    <div class="lanes">
+      <div class="lane">
+        <div class="ln">路线 A<b>云端文生 CAD</b></div>
+        <div class="flow">
+          <span class="chip">一句话</span><span class="arrow">→</span>
+          <span class="chip">云端生成</span><span class="arrow">→</span>
+          <span class="chip">STEP 下载</span><span class="arrow">→</span>
+          <span class="chip">导入 SW = Imported1</span>
+        </div>
+        <div><span class="tag no">特征树死了</span></div>
+      </div>
+      <div class="lane">
+        <div class="ln">路线 B<b>脚本化 CAD</b></div>
+        <div class="flow">
+          <span class="chip">Python 代码</span><span class="arrow">→</span>
+          <span class="chip">CadQuery 内核</span><span class="arrow">→</span>
+          <span class="chip">STEP</span><span class="arrow">→</span>
+          <span class="chip">导入 SW</span>
+        </div>
+        <div><span class="tag no">同样没有历史</span></div>
+      </div>
+      <div class="lane hl">
+        <div class="ln">路线 C<b>本地宏 / API 代理</b></div>
+        <div class="flow">
+          <span class="chip">一句话</span><span class="arrow">→</span>
+          <span class="chip">AI 写 VBA</span><span class="arrow">→</span>
+          <span class="chip">SW 执行命令</span><span class="arrow">→</span>
+          <span class="chip">原生特征树</span>
+        </div>
+        <div><span class="tag ok">你要走这条</span></div>
+      </div>
+      <div class="lane">
+        <div class="ln">路线 D<b>工程世界模型</b></div>
+        <div class="flow">
+          <span class="chip">照片/文字</span><span class="arrow">→</span>
+          <span class="chip">拆 BOM</span><span class="arrow">→</span>
+          <span class="chip">逐零件建模</span><span class="arrow">→</span>
+          <span class="chip">装配</span>
+        </div>
+        <div><span class="tag wait">SKY-001 等</span></div>
+      </div>
+    </div>
+
+    <div class="note">
+      <b>为什么只有路线 C 给你特征树？</b>
+      特征树的本质不是“模型长什么样”，而是“<strong>用了哪些命令、按什么顺序、带什么参数</strong>”。STEP 只存结果（面、边、B-rep），不存过程，所以导入后无从还原。而路线 C 是让 SolidWorks <strong>自己执行命令</strong>——命令执行完，历史自然就留下了。
+    </div>
+
+    <h3>所以“AI 建模”这件事，拆成三层能力</h3>
+    <div class="grid g3">
+      <div class="card">
+        <h4>① 表达</h4>
+        <p class="small">把脑子里的零件，说成 AI 能执行的规格：外形、尺寸、孔位、约束、材料。说不清，AI 一定写错。</p>
+      </div>
+      <div class="card">
+        <h4>② 生成</h4>
+        <p class="small">AI 把规格翻译成 API 调用序列。它不需要“会建模”，只需要“会查文档 + 会写循环”。</p>
+      </div>
+      <div class="card">
+        <h4>③ 验收</h4>
+        <p class="small">你判断结果对不对：尺寸、壁厚、孔边距、能不能加工。<strong>这一层 AI 替不了你，也是你最值钱的地方。</strong></p>
+      </div>
+    </div>
+
+    <div class="warn">
+      <b>一句话记住整张地图</b>
+      网格模型解决“看起来像”，参数化 CAD 解决“能改、能造”。<strong>你缺的从来不是生成能力，是“生成历史”的能力。</strong>路线 C 之所以成立，是因为它把 AI 从“画家”换成了“操作员”。
+    </div>
+  </div>
+</section>
+
+<!-- ================= 03 周末 ================= -->
+<section class="block" id="weekend">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-no">03</span><h2>周末冲刺线：两天，四个时段</h2></div>
+    <p class="lede">按“目标 → 动作 → 完成标志”排。每个时段 2 小时左右，做不完就顺延，别跳步——<strong>跳过的每一步，都会在后面变成一次卡死。</strong></p>
+
+    <div class="day">
+      <div class="day-h"><span class="d">DAY 1</span><span class="t">先让它动起来</span></div>
+
+      <div class="slot">
+        <div class="time">上午 · 2h</div>
+        <div class="body">
+          <h4>录一个宏，看见“鼠标动作 = 代码”</h4>
+          <p>不写代码。打开 SolidWorks，点“录制宏”，随便画一个圆、拉伸 20mm、停录、保存。</p>
+          <p>然后打开宏编辑器，从上往下读一遍。<strong>你会看到 <code>CreateCircleByRadius</code> 和 <code>FeatureExtrusion3</code></strong>——那就是你刚才点的两下鼠标。</p>
+          <span class="deliver">完成标志：你能指着代码说出“这行是我画的圆”</span>
+        </div>
+      </div>
+
+      <div class="slot">
+        <div class="time">下午 · 2h</div>
+        <div class="body">
+          <h4>跑通宏 A（法兰盘），然后故意改坏它</h4>
+          <p>复制第 06 节的宏 A，新建零件 → 工具 → 宏 → 新建 → 粘贴 → F5。</p>
+          <p>跑通后，把 <code>HOLE_N</code> 从 6 改成 10，再跑；把 <code>PCD</code> 改到比外径还大，看它怎么报错。</p>
+          <span class="deliver">完成标志：同一个宏，三种孔数都出来了；你知道报错长什么样</span>
+        </div>
+      </div>
+
+      <div class="day-h"><span class="d">DAY 2</span><span class="t">从“跑通”到“会调”</span></div>
+
+      <div class="slot">
+        <div class="time">上午 · 2h</div>
+        <div class="body">
+          <h4>宏 B + 宏 C：换一种几何，换一种思路</h4>
+          <p>阶梯轴教你“用起始面偏移叠圆柱”，齿轮坯教你“一张草图里画 20 个齿槽再一次切完”。</p>
+          <p>重点不是代码，是这两种<strong>“避开选面”的建模策略</strong>——它们决定了宏稳不稳。</p>
+          <span class="deliver">完成标志：三类零件的特征树都干净、都能改参数</span>
+        </div>
+      </div>
+
+      <div class="slot">
+        <div class="time">下午 · 2h</div>
+        <div class="body">
+          <h4>用提示词生成器，描述一个你自己的零件</h4>
+          <p>打开第 05 节的生成器，写一句话，拿到结构化提示词，丢给 AI，得到宏，跑。</p>
+          <p>大概率第一次会失败——<strong>这一段的收获就是“失败长什么样、怎么改”。</strong></p>
+          <span class="deliver">完成标志：一个不在教程里的零件，你自己调出来了</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="good">
+      <b>时间不够怎么办</b>
+      只做 Day 1 下午那 2 小时，你也能拿到“一句话出法兰”的完整体验。Day 2 是让你从“会用”走到“会调”，可以拆成两个周末。
+    </div>
+  </div>
+</section>
+
+<!-- ================= 04 环境 ================= -->
+<section class="block" id="setup">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-no">04</span><h2>部署：15 分钟把环境弄对</h2></div>
+    <p class="lede">这一步最容易翻车，也最容易一次做对。四个动作，按顺序来。</p>
+
+    <div class="steps">
+      <div class="step">
+        <b>让 SolidWorks 允许运行宏</b>
+        <p>工具 → 选项 → 系统选项 → <strong>安全性</strong>，把“宏安全性”调低到允许运行（或在弹出提示时选“启用宏”）。</p>
+        <p class="small">如果找不到，直接在 工具 → 宏 → 运行 里选一个 .swp，弹窗出现时选“启用”。公司电脑可能被组策略锁死，那就只能手动建模。</p>
+      </div>
+      <div class="step">
+        <b>建一个固定的宏文件夹</b>
+        <p><code>C:\SW_MACROS\</code>，以后所有 .swp 都放这里，并且把它加进“受信任位置”。</p>
+        <p class="small">好处：不会每次都被安全提示打断；换电脑时整个文件夹拷走就能用。</p>
+      </div>
+      <div class="step">
+        <b>打开“录制后自动编辑”</b>
+        <p>工具 → 选项 → 系统选项 → <strong>常规</strong>，勾选“录制宏后自动编辑宏”。</p>
+        <p class="small">这样你每次停录，编辑器会自己弹出来，省掉“文件在哪”的困惑。</p>
+      </div>
+      <div class="step">
+        <b>把宏挂到工具栏（可选，但很值）</b>
+        <p>工具 → 自定义 → 宏，把常用宏拖到工具栏，起个中文名，比如“法兰”。</p>
+        <p class="small">以后就是“点一下按钮，出一个零件”，比开菜单快得多。</p>
+      </div>
+    </div>
+
+    <h3>第一课：录制宏，看清 AI 到底在替你写什么</h3>
+    <p>这是整份地图里最重要的一步。做完它，你对“AI 建模”的恐惧会消失一大半。</p>
+
+    <div class="pipe">
+      <div class="pnode"><em>STEP 1</em><b>开始录制</b><span>工具 → 宏 → 录制，随便起名</span></div>
+      <div class="pnode"><em>STEP 2</em><b>画一个圆</b><span>前视基准面 → 圆 → 标注 Ø80</span></div>
+      <div class="pnode"><em>STEP 3</em><b>拉伸 20</b><span>拉伸凸台，深度 20mm，确定</span></div>
+      <div class="pnode"><em>STEP 4</em><b>停止并编辑</b><span>工具 → 宏 → 停止，编辑器自动打开</span></div>
+      <div class="pnode"><em>STEP 5</em><b>读那两行</b><span>找到 CreateCircleByRadius 和 FeatureExtrusion3</span></div>
+    </div>
+
+    <p>你录出来的代码，大概长这样（省略了无关行）：</p>
+
+    <div class="code-card">
+      <div class="code-head"><span class="lbl"><span class="dot"></span>录制宏的真实产物（片段）</span><button class="copy" data-copy="src-record">复制</button></div>
+      <pre><code id="code-record"></code></pre>
+    </div>
+
+    <div class="note">
+      <b>看懂这三行，你就看懂了全部</b>
+      <code>CreateCircleByRadius 0,0,0, 0.04</code> —— 在原点画半径 0.04 <strong>米</strong>的圆（就是 Ø80mm，注意是米）。<br>
+      <code>FeatureExtrusion3 True, False, ... 0.02 ...</code> —— 拉伸 0.02 米 = 20mm，后面一串 True/False 是方向、拔模、合并这些开关。<br>
+      所以“AI 建模”= <strong>让 AI 按顺序把这些函数排好</strong>。它不需要长眼睛，只需要知道参数。
+    </div>
+
+    <div class="bad">
+      <b>三个必踩的坑，提前说</b>
+      ① <strong>单位是米</strong>。所有长度写 0.02，不是 20。写 20 会得到一个 20 米长的零件（然后你会以为软件坏了）。<br>
+      ② <strong>基准面名字会本地化</strong>。英文界面叫 <code>Front Plane</code>，中文界面叫 <code>前视基准面</code>，写死一个就有一半人跑不了。<br>
+      ③ <strong>别用坐标去“点”面</strong>。<code>SelectByID2</code> 选面在改尺寸后极易失效，这是宏“跑一次就坏”的头号原因。
+    </div>
+
+    <h3>看视频的正确顺序：三段，总共 70 分钟</h3>
+    <p>视频不是越多越好。<strong>按“操作 → 概念 → 改现成的”这个顺序看</strong>，每段都有明确的停止条件，看完就关。</p>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:12%">顺序</th><th style="width:26%">看什么</th><th style="width:20%">在哪搜</th><th style="width:20%">看多久</th><th>什么时候停</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><b>第 1 段</b><br><span class="small">先会点</span></td>
+            <td>宏怎么开、怎么存成 .swp、怎么按 F5 跑</td>
+            <td><a href="https://search.bilibili.com/all?keyword=SolidWorks%20%E5%AE%8F%20%E5%BD%95%E5%88%B6" target="_blank" rel="noopener">B 站搜「SolidWorks 宏 录制」</a></td>
+            <td>30 分钟<br><span class="small">只看操作，跳过原理</span></td>
+            <td>你能自己录一个并保存，就够了</td>
+          </tr>
+          <tr>
+            <td><b>第 2 段</b><br><span class="small">再看懂</span></td>
+            <td>API 是怎么调用“拉伸/切除”的，<code>FeatureManager</code> 是干嘛的</td>
+            <td><a href="https://www.youtube.com/results?search_query=solidworks+api+vba+tutorial" target="_blank" rel="noopener">YouTube 搜「SolidWorks API VBA tutorial」</a></td>
+            <td>40 分钟<br><span class="small">挑 20 分钟内、讲得慢的</span></td>
+            <td>你能说出“录制的代码里哪一行是拉伸”</td>
+          </tr>
+          <tr>
+            <td><b>第 3 段</b><br><span class="small">按需查</span></td>
+            <td>别人写好的宏，怎么改成自己的参数</td>
+            <td><a href="https://www.codestack.net/solidworks-tools/" target="_blank" rel="noopener">CodeStack 宏库</a></td>
+            <td>用到再搜<br><span class="small">不要系统刷</span></td>
+            <td>找到一个相似零件，改参数能跑</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="warn">
+      <b>一个反常识的提醒</b>
+      别去搜“AI 建模教程”。出来的 99% 是 Blender / 图生 3D / 渲染，<strong>和“特征树”是两条完全不相干的路</strong>。你要搜的关键词是 <kbd>SolidWorks 宏</kbd>、<kbd>SolidWorks API</kbd>、<kbd>VBA</kbd>——听起来一点也不“AI”，但这才是能落到 .sldprt 的那条路。
+    </div>
+  </div>
+</section>
+
+<!-- ================= 05 回路 ================= -->
+<section class="block" id="loop">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-no">05</span><h2>核心回路：一句话怎么变成一棵树</h2></div>
+    <p class="lede">这条回路你只要跑顺一次，后面所有零件都是它的变体。五个节点，缺一不可；<strong>大多数人卡在 ② 和 ⑤</strong>。</p>
+
+    <div class="pipe">
+      <div class="pnode"><em>① 描述</em><b>说清规格</b><span>外形 + 关键尺寸 + 孔位 + 材料，别用形容词</span></div>
+      <div class="pnode"><em>② 提示词</em><b>加硬约束</b><span>单位、API、禁止选面、失败处理</span></div>
+      <div class="pnode"><em>③ 生成</em><b>AI 出 VBA</b><span>GPT / Claude 更稳，一次只要一个零件</span></div>
+      <div class="pnode"><em>④ 运行</em><b>粘贴执行</b><span>新建零件 → 宏 → 粘贴 → F5</span></div>
+      <div class="pnode"><em>⑤ 验收</em><b>量三个数</b><span>外形、孔位、壁厚；不对就回到 ①</span></div>
+    </div>
+
+    <h3>② 是胜负手：四段式提示词</h3>
+    <div class="grid g2">
+      <div class="card">
+        <h4>第一段 · 角色与目标</h4>
+        <p class="small">“你是 SolidWorks 2025 VBA 工程师，写一个 Sub main，在已打开的空白零件里生成……”<br>别让它建文档、别让它猜路径，减少失败点。</p>
+      </div>
+      <div class="card">
+        <h4>第二段 · 精确规格</h4>
+        <p class="small">全部用“数值 + 单位 + 位置关系”。<strong>“大概”“差不多”“美观”一律删掉</strong>，AI 对形容词的翻译一定是错的。</p>
+      </div>
+      <div class="card">
+        <h4>第三段 · 硬约束</h4>
+        <p class="small">只用 <code>FeatureExtrusion3</code> / <code>FeatureCut4</code>；换算成米；不选面，用基准面 + 双向完全贯穿；每个特征判空。</p>
+      </div>
+      <div class="card">
+        <h4>第四段 · 失败与验收</h4>
+        <p class="small">“创建失败就 MsgBox 说明原因，不要静默退出；最后 ZoomToFit 并重建。”<br>没有这段，你会得到“跑完什么都没发生”。</p>
+      </div>
+    </div>
+
+    <h3>用哪个 AI 写宏：四个工具的实测倾向</h3>
+    <p class="small">这不是跑分，是按“写 VBA + 少编 API”的稳定性给的排序。你手上有四个，别一个用到底，<strong>按任务分工</strong>。</p>
+
+    <div class="tbl-wrap" style="margin-top:12px">
+      <table>
+        <thead><tr><th style="width:18%">工具</th><th style="width:28%">强在哪</th><th style="width:27%">用来做什么</th><th>注意</th></tr></thead>
+        <tbody>
+          <tr><td><b>ChatGPT（GPT-5 系）</b></td><td>VBA / C# 语法最稳，参数顺序不容易错</td><td>第一次生成、复杂特征链</td><td>中文零件描述偶尔理解偏，尺寸要复核</td></tr>
+          <tr><td><b>Claude / Gemini</b></td><td>长代码、读官方文档强</td><td>改错、重构、让它读 API 页面</td><td>容易“过度设计”，加一堆你不需要的特征</td></tr>
+          <tr><td><b>DeepSeek</b></td><td>中文理解好、便宜、快</td><td>写中文注释、解释代码、日常小改</td><td>复杂 API 调用容易漏参数</td></tr>
+          <tr><td><b>豆包 / 通义 / Kimi</b></td><td>免登录、响应快</td><td>应急、翻译英文文档</td><td>成功率最低，别用来写复杂件</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note">
+      <b>怎么验证这张表对你自己成立</b>
+      拿同一个提示词，四个工具各跑一次宏 A，看谁<strong>第一次就零报错</strong>。三个零件之后，你会得到属于你的排序——比任何评测都准。
+    </div>
+
+    <h3>提示词生成器：把你的话，变成 AI 能执行的规格</h3>
+    <p class="small">在下面写一句中文描述，点生成，得到一段带硬约束的提示词。直接复制给 GPT / Claude / DeepSeek。</p>
+
+    <div class="card" style="margin-top:12px">
+      <label for="oneLine" style="font-size:13.5px;color:var(--muted)">一句话描述你的零件</label>
+      <textarea id="oneLine" rows="3" style="width:100%;margin-top:8px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;font-family:inherit;font-size:15px;line-height:1.7;resize:vertical;color:var(--ink);background:#fbfdff">外径 120、厚 12 的法兰盘，中心孔 Ø40，6 个 Ø11 螺栓孔均布在 Ø90 的圆上，材料 45 钢</textarea>
+      <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+        <button id="genBtn" style="border:0;background:var(--acc);color:#fff;padding:10px 20px;border-radius:10px;font-size:14px;cursor:pointer;font-family:inherit">生成提示词</button>
+        <button class="copy" data-copy="promptOut" style="background:#fff;color:var(--acc);border:1px solid #cfe6fa;border-radius:10px;padding:10px 18px">复制提示词</button>
+      </div>
+      <pre id="promptOut" style="margin-top:14px;max-height:340px;background:#0b1b2e;border-radius:12px;color:#cfe3f6"></pre>
+    </div>
+
+    <div class="warn">
+      <b>⑤ 验收，才是你和 AI 的分工线</b>
+      模型出来不等于对了。每次至少量三样：<strong>外形最大尺寸</strong>（对不对）、<strong>关键孔位</strong>（偏没偏）、<strong>最小壁厚 / 孔边距</strong>（能不能做）。AI 只保证“命令跑完”，不保证“零件合理”。
+    </div>
+  </div>
+</section>
+
+<!-- ================= 06 宏 ================= -->
+<section class="block" id="macros">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-no">06</span><h2>三个宏：复制、粘贴、运行</h2></div>
+    <p class="lede">三个宏对应三种最典型的几何策略。<strong>先照抄跑通，再改参数，最后才动代码。</strong>每个宏顶部都有参数区，只改那里。</p>
+
+    <div class="note">
+      <b>运行前必读（30 秒）</b>
+      ① 先在 SolidWorks 里<strong>新建一个空白零件</strong>，让它是当前文档；② 工具 → 宏 → 新建，起名 <code>flange.swp</code>；③ 把代码整段替换进去；④ 按 <kbd>F5</kbd>。<br>
+      如果弹“用户定义类型未定义”，说明宏里没引用 SldWorks 类型库——删掉 <code>As SldWorks.xxx</code> 里的类型名，改成 <code>As Object</code> 即可。
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="m1">A · 法兰盘 / 圆板</button>
+      <button class="tab" data-tab="m2">B · 阶梯轴</button>
+      <button class="tab" data-tab="m3">C · 齿轮坯</button>
+      <button class="tab" data-tab="m0">骨架 · 给 AI 用</button>
+    </div>
+
+    <div class="panel active" id="m1">
+      <p class="small">策略：一张草图拉伸成盘 → 所有孔画在第二张草图 → <strong>一次双向完全贯穿切完</strong>。全程不选面，所以改孔数、改分布圆都不会崩。</p>
+      <div class="code-card">
+        <div class="code-head"><span class="lbl"><span class="dot"></span>flange.swp · 法兰盘</span><button class="copy" data-copy="src-flange">复制</button></div>
+        <pre><code id="code-flange"></code></pre>
+      </div>
+      <div class="grid g3" style="margin-top:14px">
+        <div class="card"><h4>改这 3 个就够</h4><p class="small"><code>OD</code> 外径、<code>THK</code> 厚度、<code>HOLE_N</code> 孔数。<br><code>HOLE_N = 0</code> 就是不开螺栓孔。</p></div>
+        <div class="card"><h4>为什么能稳住</h4><p class="small">不依赖任何“面”的名字。孔画在基准面上，切穿两个方向，实体怎么变都切得到。</p></div>
+        <div class="card"><h4>什么时候会崩</h4><p class="small"><code>PCD</code> 接近外径时孔会破边。加个判断：<code>PCD + HOLE_D &lt; OD</code> 才有效。</p></div>
+      </div>
+    </div>
+
+    <div class="panel" id="m2">
+      <p class="small">策略：<strong>不画旋转</strong>（旋转要选中心线，容易挂），改成“一层一层叠圆柱”：每段都画在同一个基准面上，用<strong>起始面偏移</strong>把它推到该在的高度，合并成一根轴。</p>
+      <div class="code-card">
+        <div class="code-head"><span class="lbl"><span class="dot"></span>shaft.swp · 阶梯轴</span><button class="copy" data-copy="src-shaft">复制</button></div>
+        <pre><code id="code-shaft"></code></pre>
+      </div>
+      <div class="grid g3" style="margin-top:14px">
+        <div class="card"><h4>关键参数</h4><p class="small"><code>D1/L1</code>、<code>D2/L2</code>、<code>D3/L3</code>，从基准面往上依次叠。<code>T0 = 3</code> 就是“从基准面偏移”。</p></div>
+        <div class="card"><h4>为什么要叠</h4><p class="small">旋转特征必须先选一条中心线，中文界面下极易选错。叠圆柱只用圆 + 偏移，零选择。</p></div>
+        <div class="card"><h4>手动补两步</h4><p class="small">倒角、键槽建议手动做（各 10 秒）。宏负责 90%，剩下的交给你，比硬写稳。</p></div>
+      </div>
+    </div>
+
+    <div class="panel" id="m3">
+      <p class="small">策略：圆柱坯 → 中心孔 + 键槽 → <strong>一张草图里画完所有齿槽</strong>，一次切完。齿形是<strong>直边近似</strong>，用于示意、3D 打印、装配占位；真要传动，齿形用 Toolbox 或方程式生成。</p>
+      <div class="code-card">
+        <div class="code-head"><span class="lbl"><span class="dot"></span>gear.swp · 齿轮坯（含近似齿）</span><button class="copy" data-copy="src-gear">复制</button></div>
+        <pre><code id="code-gear"></code></pre>
+      </div>
+      <div class="grid g3" style="margin-top:14px">
+        <div class="card"><h4>改这 3 个</h4><p class="small"><code>TEETH</code> 齿数、<code>MODULE_MM</code> 模数、<code>WIDTH</code> 齿宽。齿顶/齿根圆自动算。</p></div>
+        <div class="card"><h4>齿形是近似的</h4><p class="small">直边梯形齿，不是渐开线。啮合会干涉，别拿它做传动设计；做占位、打印、渲染没问题。</p></div>
+        <div class="card"><h4>要真齿形</h4><p class="small">插入 → 零件 → Toolbox → 动力传动 → 齿轮，选模数齿数，30 秒出标准渐开线齿轮。</p></div>
+      </div>
+    </div>
+
+    <div class="panel" id="m0">
+      <p class="small">这段不是给你跑的，是<strong>贴给 AI 当“骨架”</strong>的。它规定了开头（取当前文档、判类型）、结尾（重建、缩放），中间让你填。AI 拿到这个骨架，写出来的宏成功率会明显高。</p>
+      <div class="code-card">
+        <div class="code-head"><span class="lbl"><span class="dot"></span>骨架 · skeleton（给 AI 的模板）</span><button class="copy" data-copy="src-skel">复制</button></div>
+        <pre><code id="code-skel"></code></pre>
+      </div>
+      <div class="note" style="margin-top:14px">
+        <b>怎么用</b>
+        把这段骨架 + 你的四段式提示词一起发给 AI，说：“按这个骨架补全中间部分，不要改开头结尾。”
+      </div>
+    </div>
+
+    <h3>代码到底在干什么：宏 A 的五个动作</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:26%">代码</th><th style="width:22%">对应你手动的动作</th><th>为什么这么写</th></tr></thead>
+        <tbody>
+          <tr><td><code>Part.GetType &lt;&gt; swDocPART</code></td><td>看一眼“这是零件吗”</td><td>防止你在装配体里跑，直接报错退出，而不是建出一堆怪东西</td></tr>
+          <tr><td><code>PickPlane(...)</code></td><td>点前视基准面</td><td>中英文两种名字都试一次，兼容中文界面</td></tr>
+          <tr><td><code>InsertSketch True</code></td><td>进入/退出草图</td><td>同一句调用两次，一次进一次出</td></tr>
+          <tr><td><code>FeatureExtrusion3(...)</code></td><td>拉伸凸台</td><td>23 个参数，前 7 个管方向与深度，后面全是开关</td></tr>
+          <tr><td><code>FeatureCut4(False,...,1,1,...)</code></td><td>拉伸切除 + 完全贯穿</td><td>双头 + 两头贯穿：不用管方向，永远不会切反</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 07 报错 ================= -->
+<section class="block" id="errors">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-no">07</span><h2>报错急救表：先看这张，再问 AI</h2></div>
+    <p class="lede">宏报错时，<strong>先定位到“哪一类”，再把错误原文贴给 AI</strong>。光说“跑不了”，AI 只能瞎猜。</p>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th style="width:22%">现象</th><th style="width:30%">真正原因</th><th>怎么修</th></tr></thead>
+        <tbody>
+          <tr><td><b>编译错误：用户定义类型未定义</b></td><td>宏没有引用 SldWorks 类型库</td><td>把 <code>As SldWorks.SldWorks</code> 等类型名删掉，统一改成 <code>As Object</code>；或工具 → 引用里勾选 SolidWorks 类型库</td></tr>
+          <tr><td><b>运行时错误 91：对象变量未设置</b></td><td>没有打开的零件，<code>ActiveDoc</code> 是空的</td><td>先新建一个零件再运行；代码里已经有判空，若仍报错说明宏没跑到判断那行</td></tr>
+          <tr><td><b>运行时错误 438：对象不支持该属性</b></td><td>API 名字拼错，或该版本没有这个方法</td><td>用录制宏录一遍同样的操作，抄它生成的函数名——这是最可靠的对齐方式</td></tr>
+          <tr><td><b>“参数个数不对”</b></td><td>不同版本 API 参数数量变了</td><td>同样：录一遍，数一下它给了几个参数，照着补/删</td></tr>
+          <tr><td><b>跑完什么都没发生</b></td><td>草图没闭合 / 没选中基准面 / 特征是 Nothing</td><td>加 <code>If feat Is Nothing Then MsgBox "失败"</code>；检查草图是否首尾相接</td></tr>
+          <tr><td><b>零件巨大或巨小 1000 倍</b></td><td>单位没换算，API 只认米</td><td>所有长度 <code>/1000</code>；角度用弧度 <code>*3.14159/180</code></td></tr>
+          <tr><td><b>切除切反了，切到空气</b></td><td>切除默认方向与草图法向相反</td><td>改用双头 + 两端完全贯穿（宏里 <code>False, ..., 1, 1</code> 就是这个意思）</td></tr>
+          <tr><td><b>找不到 Front Plane</b></td><td>中文界面基准面叫“前视基准面”</td><td>两种名字都试；或让用户手动先选中一个面，宏里不再指定</td></tr>
+          <tr><td><b>改尺寸后特征报红</b></td><td>孔超出实体、壁厚变负、圆角半径大于棱边</td><td>加参数校验：<code>PCD + HOLE_D &lt; OD</code>、<code>BORE &lt; OD</code>、<code>KEY_T &lt; (OD-BORE)/2</code></td></tr>
+          <tr><td><b>多出一堆实体不合并</b></td><td><code>Merge</code> 设了 False，或两段没接触</td><td>把 <code>Merge</code> 设为 True；确保相邻段在同一个面上相接（必要时重叠 0.05mm）</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note">
+      <b>给 AI 报错的正确姿势</b>
+      “这段宏在第 14 行报 <code>运行时错误 438</code>，我用的是 SolidWorks 2025 中文版，代码如下：……。请只改出错的那一处，其余不要重写。”<br>
+      <strong>“只改一处、不要重写”</strong>这句话能省你一半的返工——否则 AI 会把整个宏重排一遍，引入新错。
+    </div>
+  </div>
+</section>
+
+<!-- ================= 08 优化 ================= -->
+<section class="block" id="optimize">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-no">08</span><h2>优化四张表：从“能跑”到“敢用”</h2></div>
+    <p class="lede">你说的优化有四个方向，它们的方法完全不同，别混着做。<strong>先做稳健，再做效率，最后才是可制造性。</strong></p>
+
+    <div class="grid g2">
+      <div class="card">
+        <h4>① 稳健性 · 改了尺寸不崩</h4>
+        <ul class="tight">
+          <li><strong>不选面</strong>：全部用基准面 + 贯穿，别用 <code>SelectByID2</code> 点面</li>
+          <li><strong>参数集中</strong>：所有尺寸只在顶部 <code>Const</code> 区出现一次</li>
+          <li><strong>边界校验</strong>：孔不能破边、壁厚不能为负、圆角不能大于棱边</li>
+          <li><strong>顺序固定</strong>：先大形体，再孔，最后圆角——圆角放最后，改尺寸最不容易挂</li>
+          <li><strong>每次重建</strong>：结尾加 <code>EditRebuild3</code>，让错误当场暴露</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>② 效率 · 少返工、出得快</h4>
+        <ul class="tight">
+          <li><strong>建模板</strong>：零件模板里预置材料、单位、视图，宏只画几何</li>
+          <li><strong>挂按钮</strong>：常用宏拖到工具栏，一键出件</li>
+          <li><strong>批量配置</strong>：一个宏 + 一张 Excel 参数表，循环生成一串规格</li>
+          <li><strong>录制宏当字典</strong>：不会写的操作先录一遍，抄现成代码</li>
+          <li><strong>先跑通再优化</strong>：别一开始就追求“通用”，那是最大的时间黑洞</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>③ 可制造性 · 能直接拿去加工</h4>
+        <ul class="tight">
+          <li><strong>最小壁厚</strong>：钢件 ≥1.5mm，铝件 ≥1.2mm，注塑件按材料查</li>
+          <li><strong>孔边距</strong>：孔壁到边缘 ≥1.5×孔径，否则容易崩边</li>
+          <li><strong>内圆角 ≥ 刀具半径</strong>：铣削内角不能是尖角，R 至少等于刀半径</li>
+          <li><strong>公差与基准</strong>：宏只管几何，公差还得你在工程图里标</li>
+          <li><strong>拔模</strong>：注塑/铸造件别忘了 1–3° 拔模，宏里可加 <code>Dchk1=True</code></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>④ 提示词 · 让 AI 少胡说</h4>
+        <ul class="tight">
+          <li><strong>给数字不给形容词</strong>：删掉“合理”“美观”“适当”</li>
+          <li><strong>给硬约束</strong>：单位、只能用哪些 API、禁止选面</li>
+          <li><strong>一次一个零件</strong>：别让 AI 一次写“整套装配”</li>
+          <li><strong>要求完整代码</strong>：明确说“不要省略号、不要伪代码”</li>
+          <li><strong>先要清单再要代码</strong>：让它先输出“特征顺序 1→5”，你确认后再写</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="good">
+      <b>顺序建议</b>
+      先花半天把①做扎实（不选面 + 参数集中 + 判空），你会发现后面 80% 的报错自动消失了。直接冲②③，只会在一个不稳的地基上反复返工。
+    </div>
+  </div>
+</section>
+
+<!-- ================= 09 SKY ================= -->
+<section class="block" id="sky">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-no">09</span><h2>SKY-001：那个“很牛逼但还不能用”的东西</h2></div>
+    <p class="lede">你听到的传闻基本是真的，但被剪掉了最关键的一半：<strong>它是“工程世界模型”，不是“SolidWorks 插件”，而且现在只有 waitlist。</strong></p>
+
+    <div class="sky">
+      <span class="tag" style="background:rgba(127,212,255,.14);color:#9fdcff;border-color:rgba(127,212,255,.3)">2026-10 发布 · 未公开</span>
+      <h3 style="margin-top:12px">SKY-001 · Skyfall AI</h3>
+      <p>加拿大初创 Skyfall AI 发布的“首个工程世界模型”。它的思路不是“一次吐出形状”，而是<strong>像工程师一样分步做</strong>：先给几个粗略方案 → 拆成 BOM 和零件 → 每个零件从草图开始拉伸/切除 → 分层装配。这恰好是你想要的那种“有过程”的建模。</p>
+
+      <div class="kv">
+        <div><b>79.7%</b><span>3D CAD IoU（官网自报）</span></div>
+        <div><b>3.9s</b><span>单样本生成耗时</span></div>
+        <div><b>1/150</b><span>成本，对比 LLM 方案</span></div>
+        <div><b>Waitlist</b><span>当前获取方式</span></div>
+      </div>
+
+      <div class="stages">
+        <div><b>① 发散</b>一张图/一句话 → 多个粗略方案</div>
+        <div><b>② 拆解</b>分层 BOM，拆到螺钉垫圈</div>
+        <div><b>③ 建模</b>逐零件画草图、拉伸、切除</div>
+        <div><b>④ 装配</b>按层级组装成完整产品</div>
+      </div>
+
+      <p style="margin-top:22px"><a href="https://skyfall.ai/sky-001" target="_blank" rel="noopener">skyfall.ai/sky-001（官网 + waitlist）</a> · <a href="https://www.youtube.com/watch?v=bxTM5ddnU9k" target="_blank" rel="noopener">发布视频</a> · <a href="https://zhuanlan.zhihu.com/p/2096255680101593503" target="_blank" rel="noopener">中文解读</a></p>
+    </div>
+
+    <h3>为什么现在不能把它当路线</h3>
+    <div class="grid g3">
+      <div class="card">
+        <h4><span class="tag no">没有入口</span></h4>
+        <p class="small">官网只有 waitlist，没有公开 API、没有定价、没有自助试用。你搜到“还不能使用”，是准确的。</p>
+      </div>
+      <div class="card">
+        <h4><span class="tag no">格式未验证</span></h4>
+        <p class="small">官方描述是生成 3D asset / assembly，在标准 3D 查看器里看。没有任何证据表明它能导出<strong>带特征历史的 SolidWorks 文件</strong>。</p>
+      </div>
+      <div class="card">
+        <h4><span class="tag no">指标是自报</span></h4>
+        <p class="small">79.7% IoU、3.9 秒、1/150 成本，都来自官网对比表，没有第三方复现。“世界模型”目前是营销词，不是可验证的技术标准。</p>
+      </div>
+    </div>
+
+    <div class="warn">
+      <b>它来了，你怎么判断是“真能用”还是“又一个 demo”？</b>
+      看四件事：<strong>能不能导出 STEP / Parasolid</strong>（能导出才有资格谈进 CAD）；<strong>有没有特征历史</strong>（不是网格、不是死实体）；<strong>改一个参数能不能重算</strong>（不能重算就还是“生成器”）；<strong>价格是不是按件算</strong>（按件算才可能日常用）。
+    </div>
+
+    <h3>现在该练什么，等它来了你能接住</h3>
+    <p>好消息是：<strong>为路线 C 练的能力，到路线 D 一点不浪费。</strong>世界模型再强，最后也要落到“参数、约束、可制造性”上，而这些只有你能判断。</p>
+
+    <div class="grid g2">
+      <div class="card tint">
+        <h4>现在练（同时也是周末任务）</h4>
+        <ul class="tight">
+          <li>把零件说成<strong>规格</strong>的能力：外形、尺寸、孔位、材料</li>
+          <li>看懂特征顺序：为什么先大形体后孔、圆角为什么放最后</li>
+          <li>验收能力：一眼看出壁厚不够、孔会破边</li>
+          <li>参数化底子：方程式、设计表、配置（你已经有）</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>它来了再学（现在学是浪费）</h4>
+        <ul class="tight">
+          <li>它的提示词语法、账号体系、计费方式</li>
+          <li>它的导出格式与 SW 的兼容细节</li>
+          <li>它的 API / 批量调用方式</li>
+          <li>它的“重算”机制到底怎么工作</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="note">
+      <b>判断时间线的方法</b>
+      盯三个信号，不用天天刷新闻：① 官网 waitlist 变成“Sign in / Pricing”；② 出现“Export: STEP / Parasolid / SLDPRT”字样；③ 有人拿它和 Toolbox 标准件做对比测试。<strong>三个里出现两个，才值得你花时间迁移。</strong>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 10 链接 ================= -->
+<section class="block" id="links">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-no">10</span><h2>链接库：按用途分，不按网站分</h2></div>
+    <p class="lede">链接不多，但每个都在该用的位置。<strong>官方文档是唯一权威</strong>，其余都是辅助。</p>
+
+    <div class="link-head">官方 API 文档（SolidWorks 2025）</div>
+    <div class="links">
+      <a class="lk" href="https://help.solidworks.com/2025/english/api/sldworksapiprogguide/Welcome.htm" target="_blank" rel="noopener">
+        <span><span class="t">API 帮助 · 总入口</span><span class="d">所有接口、示例、枚举的起点</span></span><span class="go">官方 ↗</span></a>
+      <a class="lk" href="https://help.solidworks.com/2025/english/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.IFeatureManager~FeatureExtrusion3.html" target="_blank" rel="noopener">
+        <span><span class="t">FeatureExtrusion3</span><span class="d">拉伸：23 个参数逐个解释</span></span><span class="go">官方 ↗</span></a>
+      <a class="lk" href="https://help.solidworks.com/2025/english/api/sldworksapi/SolidWorks.Interop.sldworks~SolidWorks.Interop.sldworks.IFeatureManager~FeatureCut4.html" target="_blank" rel="noopener">
+        <span><span class="t">FeatureCut4</span><span class="d">切除：27 个参数，含双头贯穿</span></span><span class="go">官方 ↗</span></a>
+      <a class="lk" href="https://help.solidworks.com/2025/english/api/swconst/SOLIDWORKS.Interop.swconst~SOLIDWORKS.Interop.swconst.swEndConditions_e.html" target="_blank" rel="noopener">
+        <span><span class="t">swEndConditions_e</span><span class="d">盲孔=0、完全贯穿=1、双向贯穿=9</span></span><span class="go">官方 ↗</span></a>
+    </div>
+
+    <div class="link-head">工具与代码</div>
+    <div class="links">
+      <a class="lk" href="https://zoo.dev/text-to-cad" target="_blank" rel="noopener">
+        <span><span class="t">Zoo · Zookeeper</span><span class="d">浏览器里一句话出 CAD，可导出 STEP，适合先感受“文生 CAD”的边界</span></span><span class="go">试用 ↗</span></a>
+      <a class="lk" href="https://github.com/CadQuery/cadquery" target="_blank" rel="noopener">
+        <span><span class="t">CadQuery</span><span class="d">Python 参数化 CAD，输出 STEP；想“用代码描述零件”从这开始</span></span><span class="go">GitHub ↗</span></a>
+      <a class="lk" href="https://www.codestack.net/solidworks-tools/" target="_blank" rel="noopener">
+        <span><span class="t">CodeStack 宏库</span><span class="d">现成的 SolidWorks 宏合集，改一改就能用</span></span><span class="go">社区 ↗</span></a>
+      <a class="lk" href="https://forum.solidworks.com/" target="_blank" rel="noopener">
+        <span><span class="t">SolidWorks 官方论坛</span><span class="d">API 问题搜英文关键词，命中率最高</span></span><span class="go">社区 ↗</span></a>
+    </div>
+
+    <div class="link-head">看视频 / 找教程（用搜索页，别收藏会失效的单个视频）</div>
+    <div class="links">
+      <a class="lk" href="https://www.youtube.com/results?search_query=solidworks+vba+macro+tutorial" target="_blank" rel="noopener">
+        <span><span class="t">YouTube · SolidWorks VBA macro</span><span class="d">英文教程质量最高，重点看“录制→改参数”那类</span></span><span class="go">搜索 ↗</span></a>
+      <a class="lk" href="https://search.bilibili.com/all?keyword=SolidWorks%20%E5%AE%8F" target="_blank" rel="noopener">
+        <span><span class="t">B 站 · SolidWorks 宏</span><span class="d">中文入门，适合看懂界面在哪、按钮在哪</span></span><span class="go">搜索 ↗</span></a>
+    </div>
+
+    <div class="link-head">SKY-001 观察哨</div>
+    <div class="links">
+      <a class="lk" href="https://skyfall.ai/sky-001" target="_blank" rel="noopener">
+        <span><span class="t">SKY-001 官网</span><span class="d">waitlist 入口；盯“Pricing / Export”有没有出现</span></span><span class="go">官方 ↗</span></a>
+      <a class="lk" href="https://zhuanlan.zhihu.com/p/2096255680101593503" target="_blank" rel="noopener">
+        <span><span class="t">中文解读 · 知乎</span><span class="d">讲它“先 BOM 再逐零件建模”的流程，比官网好懂</span></span><span class="go">阅读 ↗</span></a>
+    </div>
+
+    <p class="small" style="margin-top:18px">说明：以上链接在 2026-10-24 均可访问。若某个 GitHub 页面打不开，多半是网络问题，不是链接失效。</p>
+  </div>
+</section>
+
+<!-- ================= 11 自测 ================= -->
+<section class="block" id="check">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-no">11</span><h2>通关自测：10 条，做到 8 条算过关</h2></div>
+    <p class="lede">这不是知识测验，是<strong>能力清单</strong>。每条都必须“亲手做过”才算，看会了不算。勾选状态会存在你本机浏览器里。</p>
+
+    <div class="checks">
+      <label class="check"><input type="checkbox" data-k="c1"><span>我能说出“为什么 STEP 导入 SW 之后特征树是死的”</span></label>
+      <label class="check"><input type="checkbox" data-k="c2"><span>我录过一个宏，并能指出哪一行对应我画的圆</span></label>
+      <label class="check"><input type="checkbox" data-k="c3"><span>我跑通了宏 A，并且改过 <code>HOLE_N</code> 和 <code>PCD</code> 各一次</span></label>
+      <label class="check"><input type="checkbox" data-k="c4"><span>我知道 API 的长度单位是米，并且亲手踩过一次“大 1000 倍”的坑</span></label>
+      <label class="check"><input type="checkbox" data-k="c5"><span>我能解释“为什么切除要用双头贯穿，而不是盲孔”</span></label>
+      <label class="check"><input type="checkbox" data-k="c6"><span>我跑通了宏 B，并且看懂“起始面偏移叠圆柱”这个策略</span></label>
+      <label class="check"><input type="checkbox" data-k="c7"><span>我跑通了宏 C，并且知道它的齿形只是近似、不能用于传动</span></label>
+      <label class="check"><input type="checkbox" data-k="c8"><span>我用提示词生成器描述过一个教程里没有的零件，并让 AI 写出了能跑的宏</span></label>
+      <label class="check"><input type="checkbox" data-k="c9"><span>我遇到过一次报错，并靠第 07 节的表 + 贴错误原文给 AI 解决了</span></label>
+      <label class="check"><input type="checkbox" data-k="c10"><span>我能说出 SKY-001 是什么、现在为什么不能用、以及它来了我要看哪四个信号</span></label>
+    </div>
+
+    <div class="score">
+      <div class="num" id="scoreNum">0 / 10</div>
+      <div class="bar"><i id="scoreFill"></i></div>
+      <div id="scoreMsg">刚开始。先做 Day 1 上午那 30 分钟：录一个宏，看一眼代码。</div>
+    </div>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:24px">
+      <button onclick="window.print()" style="border:1px solid var(--line);background:#fff;color:var(--ink2);padding:10px 18px;border-radius:10px;font-size:14px;cursor:pointer;font-family:inherit">打印 / 存成 PDF</button>
+      <button id="resetBtn" style="border:1px solid var(--line);background:#fff;color:var(--muted);padding:10px 18px;border-radius:10px;font-size:14px;cursor:pointer;font-family:inherit">清空勾选</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p><strong>关于这份地图</strong>：内容基于 2026-10-24 的公开资料与 SolidWorks 2025 API 文档整理。三个宏按官方 API 签名编写（<code>FeatureExtrusion3</code> 23 参数、<code>FeatureCut4</code> 27 参数），但<strong>未在你的机器上实跑</strong>——首次运行前请先保存零件，出错就对照第 07 节。</p>
+    <p><strong>关于授权</strong>：破解版仅建议用于个人学习。宏与 API 属于本地功能，不依赖官方云服务，因此可以运行；但商业交付请使用正版授权，否则图纸与模型的责任无法界定。</p>
+    <p><strong>关于 AI</strong>：本文所有“AI 写宏”的流程，用的是通用对话模型，不绑定任何一家。模型会更新，方法不会。</p>
+    <p style="margin-top:16px;font-family:var(--mono);font-size:12px;color:#9db4c9">SKY / AI 建模学习地图 · v1.0 · 2026-10-24</p>
+  </div>
+</footer>
+
+<button class="top" id="topBtn" aria-label="回到顶部">↑</button>
+
+<!-- ================= 代码源（不参与渲染） ================= -->
+<script type="text/plain" id="src-record">
+' 这是录制宏会自动生成的东西（片段，已删无关行）
+' 你只画了一个圆 + 拉伸 20mm，它写了这么多
+
+Dim swApp As SldWorks.SldWorks
+Dim Part As SldWorks.ModelDoc2
+Dim boolstatus As Boolean
+
+Set swApp = Application.SldWorks
+Set Part = swApp.ActiveDoc
+
+boolstatus = Part.Extension.SelectByID2("Front Plane", "PLANE", 0, 0, 0, False, 0, Nothing, 0)
+Part.SketchManager.InsertSketch True
+Part.ClearSelection2 True
+
+' ↓ 这一行 = 你点“圆”，在原点拖了一个 Ø80
+Part.SketchManager.CreateCircleByRadius 0, 0, 0, 0.04
+
+Part.SketchManager.InsertSketch True   ' 退出草图
+
+' ↓ 这一行 = 你点“拉伸凸台”，输入 20mm，回车
+Part.FeatureManager.FeatureExtrusion3 True, False, False, 0, 0, 0.02, 0.02, _
+    False, False, False, False, 0, 0, False, False, False, False, _
+    True, True, True, 0, 0, False
+
+' 结论：鼠标动作 = 函数调用。AI 要做的，只是把这些函数按正确顺序排好。
+</script>
+
+<script type="text/plain" id="src-flange">
+'==============================================================
+' 宏 A · 法兰盘 / 圆板
+' 用法：新建空白零件 → 工具 > 宏 > 新建 → 粘贴全文 → F5
+' 单位：参数写毫米，宏内部自动换算成米（SW API 只用米）
+'==============================================================
+Option Explicit
+
+' ---------------- 参数区（只改这里） ----------------
+Const OD      As Double  = 120    ' 外径 mm
+Const THK     As Double  = 12     ' 厚度 mm
+Const BORE    As Double  = 40     ' 中心孔直径 mm（填 0 = 不开孔）
+Const PCD     As Double  = 90     ' 螺栓孔中心圆直径 mm
+Const HOLE_D  As Double  = 11     ' 螺栓孔直径 mm
+Const HOLE_N  As Integer = 6      ' 螺栓孔数量（填 0 = 不开孔）
+' ---------------------------------------------------
+
+Sub main()
+
+    Dim swApp As SldWorks.SldWorks
+    Dim Part  As SldWorks.ModelDoc2
+    Dim sk    As SldWorks.SketchManager
+    Dim fm    As SldWorks.FeatureManager
+    Dim feat  As SldWorks.Feature
+    Dim i     As Integer
+    Dim a     As Double, x As Double, y As Double
+    Dim R     As Double, rH As Double, rP As Double
+
+    Set swApp = Application.SldWorks
+    Set Part = swApp.ActiveDoc
+
+    If Part Is Nothing Then
+        MsgBox "请先新建一个空白零件，再运行本宏。"
+        Exit Sub
+    End If
+    If Part.GetType <> swDocPART Then
+        MsgBox "当前不是零件文档，请打开 .SLDPRT 后再运行。"
+        Exit Sub
+    End If
+
+    Set sk = Part.SketchManager
+    Set fm = Part.FeatureManager
+
+    R = OD / 2000#          ' 半径，毫米 -> 米
+    rH = HOLE_D / 2000#
+    rP = PCD / 2000#
+
+    ' ---- ① 外圆：草图 -> 拉伸 ----
+    If Not PickPlane(Part, "Front Plane", "前视基准面") Then
+        MsgBox "选不到前视基准面，请手动点选一个基准面后重跑。"
+        Exit Sub
+    End If
+
+    sk.InsertSketch True
+    sk.CreateCircleByRadius 0, 0, 0, R
+    sk.InsertSketch True
+
+    Set feat = fm.FeatureExtrusion3(True, False, False, 0, 0, THK / 1000#, 0, _
+        False, False, False, False, 0, 0, False, False, False, False, _
+        True, True, True, 0, 0, False)
+
+    If feat Is Nothing Then
+        MsgBox "拉伸失败。常见原因：草图没闭合 / 没选中基准面。"
+        Exit Sub
+    End If
+
+    ' ---- ② 所有孔画在一张草图，一次「双向完全贯穿」切掉 ----
+    If (BORE > 0) Or (HOLE_N > 0) Then
+
+        If Not PickPlane(Part, "Front Plane", "前视基准面") Then Exit Sub
+        sk.InsertSketch True
+
+        If BORE > 0 Then sk.CreateCircleByRadius 0, 0, 0, BORE / 2000#
+
+        For i = 0 To HOLE_N - 1
+            a = 2 * 3.14159265358979 * i / HOLE_N
+            x = rP * Cos(a)
+            y = rP * Sin(a)
+            sk.CreateCircleByRadius x, y, 0, rH
+        Next i
+
+        sk.InsertSketch True
+
+        ' Sd=False 双头、两端都完全贯穿 -> 不用管方向，永远切不反
+        Set feat = fm.FeatureCut4(False, False, False, 1, 1, 0, 0, _
+            False, False, False, False, 0, 0, False, False, False, False, _
+            False, True, True, False, False, False, 0, 0, False, False)
+
+        If feat Is Nothing Then MsgBox "切除失败：检查孔的草图是否与实体相交。"
+    End If
+
+    Part.ClearSelection2 True
+    Part.ViewZoomtofit2
+    Part.EditRebuild3
+    MsgBox "完成：" & OD & " x " & THK & " mm，" & HOLE_N & " 个孔。改参数重跑即可。"
+
+End Sub
+
+' 中英文界面通用的基准面选择
+Private Function PickPlane(Part As SldWorks.ModelDoc2, en As String, cn As String) As Boolean
+    Part.ClearSelection2 True
+    If Part.Extension.SelectByID2(en, "PLANE", 0, 0, 0, False, 0, Nothing, 0) Then
+        PickPlane = True
+    ElseIf Part.Extension.SelectByID2(cn, "PLANE", 0, 0, 0, False, 0, Nothing, 0) Then
+        PickPlane = True
+    End If
+End Function
+</script>
+
+<script type="text/plain" id="src-shaft">
+'==============================================================
+' 宏 B · 阶梯轴（叠圆柱法，不用旋转、不选面）
+' 用法：新建空白零件 → 工具 > 宏 > 新建 → 粘贴 → F5
+'==============================================================
+Option Explicit
+
+' ---------------- 参数区：从基准面往上依次叠 ----------------
+Const D1 As Double = 30:  Const L1 As Double = 60   ' 第 1 段 直径 / 长度
+Const D2 As Double = 45:  Const L2 As Double = 25   ' 第 2 段
+Const D3 As Double = 25:  Const L3 As Double = 40   ' 第 3 段
+' ----------------------------------------------------------
+
+Sub main()
+
+    Dim swApp As SldWorks.SldWorks
+    Dim Part  As SldWorks.ModelDoc2
+    Dim sk    As SldWorks.SketchManager
+    Dim fm    As SldWorks.FeatureManager
+    Dim feat  As SldWorks.Feature
+    Dim D(2)  As Double
+    Dim L(2)  As Double
+    Dim i     As Integer
+    Dim z0    As Double
+
+    Set swApp = Application.SldWorks
+    Set Part = swApp.ActiveDoc
+
+    If Part Is Nothing Then
+        MsgBox "请先新建一个空白零件。"
+        Exit Sub
+    End If
+    If Part.GetType <> swDocPART Then
+        MsgBox "当前不是零件文档。"
+        Exit Sub
+    End If
+
+    Set sk = Part.SketchManager
+    Set fm = Part.FeatureManager
+
+    D(0) = D1: L(0) = L1
+    D(1) = D2: L(1) = L2
+    D(2) = D3: L(2) = L3
+    z0 = 0
+
+    For i = 0 To 2
+
+        If Not PickPlane(Part, "Top Plane", "上视基准面") Then
+            MsgBox "选不到上视基准面。"
+            Exit Sub
+        End If
+
+        sk.InsertSketch True
+        sk.CreateCircleByRadius 0, 0, 0, D(i) / 2000#
+        sk.InsertSketch True
+
+        ' 第 21 个参数 T0 = 3 -> swStartOffset：从草图面偏移 z0 开始
+        ' 第 22 个参数 StartOffset 单位是米
+        Set feat = fm.FeatureExtrusion3(True, False, False, 0, 0, L(i) / 1000#, 0, _
+            False, False, False, False, 0, 0, False, False, False, False, _
+            True, True, True, 3, z0, False)
+
+        If feat Is Nothing Then
+            MsgBox "第 " & (i + 1) & " 段拉伸失败。"
+            Exit Sub
+        End If
+
+        z0 = z0 + L(i) / 1000#
+    Next i
+
+    Part.ClearSelection2 True
+    Part.ViewZoomtofit2
+    Part.EditRebuild3
+    MsgBox "阶梯轴完成：3 段，总长 " & (L1 + L2 + L3) & " mm。倒角/键槽请手动补。"
+
+End Sub
+
+Private Function PickPlane(Part As SldWorks.ModelDoc2, en As String, cn As String) As Boolean
+    Part.ClearSelection2 True
+    If Part.Extension.SelectByID2(en, "PLANE", 0, 0, 0, False, 0, Nothing, 0) Then
+        PickPlane = True
+    ElseIf Part.Extension.SelectByID2(cn, "PLANE", 0, 0, 0, False, 0, Nothing, 0) Then
+        PickPlane = True
+    End If
+End Function
+</script>
+
+<script type="text/plain" id="src-gear">
+'==============================================================
+' 宏 C · 齿轮坯（圆柱 + 中心孔 + 键槽 + 近似直边齿）
+' 注意：齿形为梯形近似，仅供示意 / 3D 打印 / 装配占位。
+'       真传动请用 Toolbox 标准齿轮或方程式渐开线。
+' 用法：新建空白零件 → 工具 > 宏 > 新建 → 粘贴 → F5
+'==============================================================
+Option Explicit
+
+' ---------------- 参数区 ----------------
+Const TEETH      As Integer = 20     ' 齿数
+Const MODULE_MM  As Double  = 3      ' 模数 mm
+Const WIDTH      As Double  = 20     ' 齿宽（厚度）mm
+Const BORE_D     As Double  = 20     ' 中心孔直径 mm
+Const KEY_W      As Double  = 6      ' 键槽宽 mm
+Const KEY_T      As Double  = 3.5    ' 键槽深（从孔壁算）mm
+Const CUT_TEETH  As Boolean = True   ' 是否切齿（False = 只要齿坯）
+' ----------------------------------------
+
+Sub main()
+
+    Dim swApp As SldWorks.SldWorks
+    Dim Part  As SldWorks.ModelDoc2
+    Dim sk    As SldWorks.SketchManager
+    Dim fm    As SldWorks.FeatureManager
+    Dim feat  As SldWorks.Feature
+    Dim Rtip  As Double, Rroot As Double
+    Dim i     As Integer
+    Dim ac    As Double, hTip As Double, hRoot As Double
+    Dim x1 As Double, y1 As Double, x2 As Double, y2 As Double
+    Dim x3 As Double, y3 As Double, x4 As Double, y4 As Double
+    Dim PI_   As Double
+
+    Set swApp = Application.SldWorks
+    Set Part = swApp.ActiveDoc
+
+    If Part Is Nothing Then
+        MsgBox "请先新建一个空白零件。"
+        Exit Sub
+    End If
+    If Part.GetType <> swDocPART Then
+        MsgBox "当前不是零件文档。"
+        Exit Sub
+    End If
+
+    Set sk = Part.SketchManager
+    Set fm = Part.FeatureManager
+    PI_ = 3.14159265358979
+
+    ' 齿顶圆 / 齿根圆（米）
+    Rtip = (TEETH + 2) * MODULE_MM / 2000#
+    Rroot = (TEETH - 2.5) * MODULE_MM / 2000#
+
+    If Rroot <= BORE_D / 2000# + 0.002 Then
+        MsgBox "参数不合理：齿根圆太小，或孔径太大。"
+        Exit Sub
+    End If
+
+    ' ---- ① 圆柱坯 ----
+    If Not PickPlane(Part, "Front Plane", "前视基准面") Then Exit Sub
+    sk.InsertSketch True
+    sk.CreateCircleByRadius 0, 0, 0, Rtip
+    sk.InsertSketch True
+
+    Set feat = fm.FeatureExtrusion3(True, False, False, 0, 0, WIDTH / 1000#, 0, _
+        False, False, False, False, 0, 0, False, False, False, False, _
+        True, True, True, 0, 0, False)
+    If feat Is Nothing Then
+        MsgBox "齿坯拉伸失败。"
+        Exit Sub
+    End If
+
+    ' ---- ② 中心孔 + 键槽（一张草图，一次切穿）----
+    If Not PickPlane(Part, "Front Plane", "前视基准面") Then Exit Sub
+    sk.InsertSketch True
+    sk.CreateCircleByRadius 0, 0, 0, BORE_D / 2000#
+    ' 键槽：从孔心沿 +X 拉到孔壁外 KEY_T，宽度 KEY_W
+    sk.CreateCornerRectangle 0, -KEY_W / 2000#, 0, _
+        (BORE_D / 2000# + KEY_T / 1000#), KEY_W / 2000#, 0
+    sk.InsertSketch True
+
+    Set feat = fm.FeatureCut4(False, False, False, 1, 1, 0, 0, _
+        False, False, False, False, 0, 0, False, False, False, False, _
+        False, True, True, False, False, False, 0, 0, False, False)
+    If feat Is Nothing Then MsgBox "中心孔/键槽切除失败。"
+
+    ' ---- ③ 近似齿：一张草图里画完所有齿槽，一次切穿 ----
+    If CUT_TEETH Then
+
+        If Not PickPlane(Part, "Front Plane", "前视基准面") Then Exit Sub
+        sk.InsertSketch True
+
+        hTip = PI_ / TEETH * 0.62
+        hRoot = PI_ / TEETH * 0.40
+
+        For i = 0 To TEETH - 1
+
+            ac = 2 * PI_ * (i + 0.5) / TEETH
+
+            x1 = Rtip * Cos(ac - hTip):  y1 = Rtip * Sin(ac - hTip)
+            x2 = Rtip * Cos(ac + hTip):  y2 = Rtip * Sin(ac + hTip)
+            x3 = Rroot * Cos(ac + hRoot): y3 = Rroot * Sin(ac + hRoot)
+            x4 = Rroot * Cos(ac - hRoot): y4 = Rroot * Sin(ac - hRoot)
+
+            sk.CreateLine x1, y1, 0, x2, y2, 0
+            sk.CreateLine x2, y2, 0, x3, y3, 0
+            sk.CreateLine x3, y3, 0, x4, y4, 0
+            sk.CreateLine x4, y4, 0, x1, y1, 0
+
+        Next i
+
+        sk.InsertSketch True
+
+        Set feat = fm.FeatureCut4(False, False, False, 1, 1, 0, 0, _
+            False, False, False, False, 0, 0, False, False, False, False, _
+            False, True, True, False, False, False, 0, 0, False, False)
+
+        If feat Is Nothing Then MsgBox "切齿失败：检查齿槽草图是否闭合。"
+    End If
+
+    Part.ClearSelection2 True
+    Part.ViewZoomtofit2
+    Part.EditRebuild3
+    MsgBox "齿轮坯完成：" & TEETH & " 齿 / 模数 " & MODULE_MM & " / 厚 " & WIDTH & " mm"
+
+End Sub
+
+Private Function PickPlane(Part As SldWorks.ModelDoc2, en As String, cn As String) As Boolean
+    Part.ClearSelection2 True
+    If Part.Extension.SelectByID2(en, "PLANE", 0, 0, 0, False, 0, Nothing, 0) Then
+        PickPlane = True
+    ElseIf Part.Extension.SelectByID2(cn, "PLANE", 0, 0, 0, False, 0, Nothing, 0) Then
+        PickPlane = True
+    End If
+End Function
+</script>
+
+<script type="text/plain" id="src-skel">
+'==== 给 AI 的骨架：让它只填中间，不要改首尾 ====
+Option Explicit
+
+Sub main()
+
+    Dim swApp As SldWorks.SldWorks
+    Dim Part  As SldWorks.ModelDoc2
+    Dim sk    As SldWorks.SketchManager
+    Dim fm    As SldWorks.FeatureManager
+    Dim feat  As SldWorks.Feature
+
+    Set swApp = Application.SldWorks
+    Set Part = swApp.ActiveDoc
+
+    If Part Is Nothing Then
+        MsgBox "请先新建一个空白零件。"
+        Exit Sub
+    End If
+    If Part.GetType <> swDocPART Then
+        MsgBox "当前不是零件文档。"
+        Exit Sub
+    End If
+
+    Set sk = Part.SketchManager
+    Set fm = Part.FeatureManager
+
+    ' ================= 建模步骤（由 AI 补全）=================
+    ' 约定：
+    '   长度一律 毫米 / 1000  -> 米
+    '   只用 FeatureExtrusion3 / FeatureCut4
+    '   每张草图前先 PickPlane(Part, "Front Plane", "前视基准面")
+    '   切除用 FeatureCut4(False, False, False, 1, 1, ...) 双向贯穿
+    '   每个特征后 If feat Is Nothing Then MsgBox "失败" : Exit Sub
+    ' =========================================================
+
+    Part.ClearSelection2 True
+    Part.ViewZoomtofit2
+    Part.EditRebuild3
+
+End Sub
+
+Private Function PickPlane(Part As SldWorks.ModelDoc2, en As String, cn As String) As Boolean
+    Part.ClearSelection2 True
+    If Part.Extension.SelectByID2(en, "PLANE", 0, 0, 0, False, 0, Nothing, 0) Then
+        PickPlane = True
+    ElseIf Part.Extension.SelectByID2(cn, "PLANE", 0, 0, 0, False, 0, Nothing, 0) Then
+        PickPlane = True
+    End If
+End Function
+</script>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(s,r){ return (r||document).querySelector(s); };
+  var $$ = function(s,r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); };
+
+  /* ---------- 代码注入 ---------- */
+  $$('script[type="text/plain"]').forEach(function(src){
+    var id = src.id.replace(/^src-/, '');
+    var target = document.getElementById('code-' + id);
+    if(target) target.textContent = src.textContent.replace(/^\s*\n/, '').replace(/\s+$/, '');
+  });
+
+  /* ---------- 复制 ---------- */
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest('[data-copy]');
+    if(!btn) return;
+    var src = document.getElementById(btn.getAttribute('data-copy'));
+    if(!src) return;
+    var text = (src.tagName === 'TEXTAREA' ? src.value : src.textContent).trim();
+    var done = function(){
+      var old = btn.textContent;
+      btn.textContent = '已复制';
+      btn.classList.add('ok');
+      setTimeout(function(){ btn.textContent = old; btn.classList.remove('ok'); }, 1600);
+    };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done).catch(function(){ fallback(text, done); });
+    } else {
+      fallback(text, done);
+    }
+  });
+
+  function fallback(text, cb){
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try{ document.execCommand('copy'); cb(); }catch(err){}
+    document.body.removeChild(ta);
+  }
+
+  /* ---------- Tabs ---------- */
+  $$('.tab').forEach(function(tab){
+    tab.addEventListener('click', function(){
+      var scope = tab.closest('.wrap') || document;
+      var key = tab.getAttribute('data-tab');
+      $$('.tab', scope).forEach(function(t){ t.classList.toggle('active', t === tab); });
+      $$('.panel', scope).forEach(function(p){ p.classList.toggle('active', p.id === key); });
+    });
+  });
+
+  /* ---------- 进度条 ---------- */
+  var bar = document.getElementById('progress');
+  var topBtn = document.getElementById('topBtn');
+  function onScroll(){
+    var h = document.documentElement;
+    var max = h.scrollHeight - h.clientHeight;
+    var pct = max > 0 ? (h.scrollTop / max) * 100 : 0;
+    if(bar) bar.style.width = pct + '%';
+    if(topBtn) topBtn.classList.toggle('show', h.scrollTop > 700);
+  }
+  document.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+  if(topBtn) topBtn.addEventListener('click', function(){ window.scrollTo({top:0, behavior:'smooth'}); });
+
+  /* ---------- 当前章节高亮 ---------- */
+  var navLinks = $$('.nav a');
+  var sections = $$('section[id]');
+  if('IntersectionObserver' in window){
+    var navObs = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(!en.isIntersecting) return;
+        navLinks.forEach(function(a){
+          a.classList.toggle('active', a.getAttribute('href') === '#' + en.target.id);
+        });
+      });
+    }, {rootMargin: '-40% 0px -55% 0px'});
+    sections.forEach(function(s){ navObs.observe(s); });
+  }
+
+  /* ---------- 渐入 ---------- */
+  var revealTargets = $$('.card, .lane, .slot, .step, .code-card, .tbl-wrap, .lk');
+  revealTargets.forEach(function(el){ el.classList.add('reveal'); });
+  if('IntersectionObserver' in window){
+    var ro = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){ en.target.classList.add('in'); ro.unobserve(en.target); }
+      });
+    }, {threshold: 0.06});
+    revealTargets.forEach(function(el){ ro.observe(el); });
+    // 兜底：观察器在锚点跳转 / 虚拟时间等环境下可能不回调，1.2 秒后强制显示
+    setTimeout(function(){
+      revealTargets.forEach(function(el){ el.classList.add('in'); });
+    }, 1200);
+  } else {
+    revealTargets.forEach(function(el){ el.classList.add('in'); });
+  }
+
+  /* ---------- 勾选清单 ---------- */
+  var KEY = 'skymap.v1';
+  var state = {};
+  try{ state = JSON.parse(localStorage.getItem(KEY) || '{}'); }catch(err){ state = {}; }
+
+  var boxes = $$('input[type=checkbox][data-k]');
+  boxes.forEach(function(cb){
+    cb.checked = !!state[cb.getAttribute('data-k')];
+    cb.addEventListener('change', function(){
+      state[cb.getAttribute('data-k')] = cb.checked;
+      try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(err){}
+      updateScore();
+    });
+  });
+
+  function updateScore(){
+    var total = boxes.length;
+    var done = boxes.filter(function(c){ return c.checked; }).length;
+    var pct = total ? Math.round(done / total * 100) : 0;
+    var num = document.getElementById('scoreNum');
+    var fill = document.getElementById('scoreFill');
+    var msg = document.getElementById('scoreMsg');
+    if(!num) return;
+    num.textContent = done + ' / ' + total;
+    fill.style.width = pct + '%';
+    if(pct === 100){
+      msg.textContent = '通关。你已经跑通「一句话 → 宏 → 可编辑特征树」的完整回路，接下来就是攒自己的零件库。';
+    }else if(pct >= 70){
+      msg.textContent = '只差最后几步：把第三个零件跑完，再故意改坏一个参数，看它怎么报错。';
+    }else if(pct >= 30){
+      msg.textContent = '过半了。接下来的重点不是「看懂」，是「手跑一遍」。';
+    }else{
+      msg.textContent = '刚开始。先做 Day 1 上午那 30 分钟：录一个宏，看一眼代码。';
+    }
+  }
+  updateScore();
+
+  var reset = document.getElementById('resetBtn');
+  if(reset) reset.addEventListener('click', function(){
+    state = {};
+    try{ localStorage.removeItem(KEY); }catch(err){}
+    boxes.forEach(function(c){ c.checked = false; });
+    updateScore();
+  });
+
+  /* ---------- 提示词生成器 ---------- */
+  var genBtn = document.getElementById('genBtn');
+  var oneLine = document.getElementById('oneLine');
+  var promptOut = document.getElementById('promptOut');
+
+  function buildPrompt(){
+    var desc = (oneLine && oneLine.value ? oneLine.value : '').trim();
+    if(!desc) desc = '外径 120、厚 12 的法兰盘，中心孔 Ø40，6 个 Ø11 螺栓孔均布在 Ø90 的圆上';
+
+    return [
+      '你是 SolidWorks 2025 的 VBA 工程师。请写一个可直接运行的 .swp 宏（Sub main），在【已打开的空白零件】里生成下面的零件。',
+      '',
+      '【零件】',
+      desc,
+      '',
+      '【硬约束，必须全部遵守】',
+      '1. 只使用 IFeatureManager.FeatureExtrusion3 和 FeatureCut4，不要用其它建模接口。',
+      '2. 长度单位是米：所有毫米数值除以 1000 再传参；角度用弧度。',
+      '3. 禁止用 SelectByID2 去点面或边。所有草图都画在基准面上；切除一律用「双头 + 两端完全贯穿」。',
+      '4. 基准面先用 "Front Plane"，失败再试 "前视基准面"（兼容中文界面）。',
+      '5. 每个特征创建后判断返回值是否为 Nothing，失败就 MsgBox 说明是哪一步失败，然后 Exit Sub。',
+      '6. 结尾调用 ViewZoomtofit2 和 EditRebuild3。',
+      '',
+      '【输出要求】',
+      '输出完整代码，从 Option Explicit 开始，不要省略号、不要伪代码、不要解释。',
+      '代码块之前，先用 5 行以内列出「特征顺序清单」，我确认后再写代码。'
+    ].join('\n');
+  }
+
+  if(promptOut) promptOut.textContent = buildPrompt();
+  if(genBtn) genBtn.addEventListener('click', function(){
+    if(promptOut) promptOut.textContent = buildPrompt();
+  });
+})();
+</script>
+</body>
+</html>
